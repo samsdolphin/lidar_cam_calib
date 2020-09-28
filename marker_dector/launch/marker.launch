@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="marker_detector" type="marker_detector" name="marker_detector" output="screen">
+        <param name= "cam_cal_file" type="string" value="$(find marker_detector)/config/left.yaml"/>
+        <remap from="~image_raw" to="/camera/infra1/image_rect_raw"/>
+        <remap from="~camera_pose" to="/vins_estimator/camera_pose"/>
+    </node>
+</launch>
