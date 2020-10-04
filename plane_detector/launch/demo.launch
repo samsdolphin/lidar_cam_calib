@@ -1,0 +1,10 @@
+<launch>
+
+	<node pkg="plane_detector" type="detect_plane" name="detect_plane" output="screen"/>
+
+	<arg name="rviz" default="true"/>
+	<group if="$(arg rviz)">
+		<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find plane_detector)/rviz/rosrun.rviz"/>
+	</group>
+
+</launch>
