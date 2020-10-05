@@ -20,7 +20,7 @@ using namespace Eigen;
 
 typedef pcl::PointXYZI PointType;
 pcl::PointCloud<PointType>::Ptr pc_surf(new pcl::PointCloud<PointType>);
-string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane1.json";
+string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane_lasi.json";
 
 #define PI 3.14159265
 int max_svd_it = 30;
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     ros::Subscriber sub_surf = nh.subscribe<sensor_msgs::PointCloud2>("/pc2_surfaceN", 10000, surf_callback);
 
     pcl::PointCloud<PointType>::Ptr pc_src(new pcl::PointCloud<PointType>);
-    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane.json");
+    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane_lasi.json");
     pcl::PointCloud<PointType>::Ptr pc_rough(new pcl::PointCloud<PointType>);
     pc_rough->points.resize(1e8);
     size_t cnt = 0;
