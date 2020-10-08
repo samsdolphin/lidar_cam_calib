@@ -20,7 +20,7 @@ using namespace Eigen;
 
 typedef pcl::PointXYZI PointType;
 pcl::PointCloud<PointType>::Ptr pc_surf(new pcl::PointCloud<PointType>);
-string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane_lasi.json";
+string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/new/1.json";
 
 #define PI 3.14159265
 int max_svd_it = 30;
@@ -93,14 +93,16 @@ int main(int argc, char** argv)
     ros::Subscriber sub_surf = nh.subscribe<sensor_msgs::PointCloud2>("/pc2_surfaceN", 10000, surf_callback);
 
     pcl::PointCloud<PointType>::Ptr pc_src(new pcl::PointCloud<PointType>);
-    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/plane_lasi.json");
+    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/new/1.json");
     pcl::PointCloud<PointType>::Ptr pc_rough(new pcl::PointCloud<PointType>);
     pc_rough->points.resize(1e8);
     size_t cnt = 0;
 
     for (size_t i = 0; i < pc_src->points.size(); i++)
     {
-        if (pc_src->points[i].z > 0 && pc_src->points[i].x < 5)
+        if (pc_src->points[i].z > -0.5 && pc_src->points[i].z < 0.6 &&
+            pc_src->points[i].y > -0.3 && pc_src->points[i].y < 0.3 &&
+            pc_src->points[i].x > 0 && pc_src->points[i].x < 3)
             {
                 pc_rough->points[cnt].x = pc_src->points[i].x;
                 pc_rough->points[cnt].y = pc_src->points[i].y;
