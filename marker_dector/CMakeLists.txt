@@ -6,16 +6,16 @@ set(CMAKE_CXX_FLAGS "-std=c++11 -march=native -DEIGEN_DONT_PARALLELIZE")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
 
 find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    std_msgs
-    cv_bridge
-    message_filters
-    )
+  roscpp
+  std_msgs
+  cv_bridge
+  message_filters
+)
 
 find_package(OpenCV REQUIRED)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Eigen3  REQUIRED)
+find_package(Eigen3 REQUIRED)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
@@ -27,3 +27,6 @@ catkin_package()
 
 add_executable(aruco src/aruco.cpp)
 target_link_libraries(aruco ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+
+add_executable(checker src/checker.cpp)
+target_link_libraries(checker ${catkin_LIBRARIES} ${OpenCV_LIBS})
