@@ -36,6 +36,13 @@ Toolbars:
 Visualization Manager:
   Class: ""
   Displays:
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: Axes
+      Radius: 0.100000001
+      Reference Frame: <Fixed Frame>
+      Value: true
     - Alpha: 0.5
       Cell Size: 1
       Class: rviz/Grid
@@ -140,7 +147,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 2
+      Size (Pixels): 3
       Size (m): 0.00999999978
       Style: Points
       Topic: /rough_surf
@@ -211,25 +218,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.57499933
+      Distance: 12.6973448
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.57567215
-        Y: 0.766866565
-        Z: 0.249369219
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.56979632
+      Pitch: 0.955398083
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.54689121
+      Yaw: 2.66540861
     Saved: ~
 Window Geometry:
   Displays:
