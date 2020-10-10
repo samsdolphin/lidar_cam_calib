@@ -25,8 +25,8 @@ find_package(aruco REQUIRED)
 
 catkin_package()
 
-add_executable(marker_detector src/marker_detector_node.cpp)
-target_link_libraries(marker_detector ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+add_executable(aruco src/aruco_detector.cpp)
+target_link_libraries(aruco ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
 
-add_executable(aruco_detector src/aruco_detector.cpp)
-target_link_libraries(aruco_detector ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+add_executable(checkerboard src/checkerboard.cpp src/camera_calibration.cpp)
+target_link_libraries(checkerboard ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
