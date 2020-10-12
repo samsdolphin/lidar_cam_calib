@@ -8,12 +8,13 @@
 
 using namespace cv;
 
-double camera_calibrator::computeReprojectionErrors(
-        const vector<vector<Point3f> >& objectPoints,
-        const vector<vector<Point2f> >& imagePoints,
-        const vector<Mat>& rvecs, const vector<Mat>& tvecs,
-        const Mat& cameraMatrix, const Mat& distCoeffs,
-        vector<float>& perViewErrors)
+double camera_calibrator::computeReprojectionErrors(const vector<vector<Point3f>>& objectPoints,
+                                                    const vector<vector<Point2f>>& imagePoints,
+                                                    const vector<Mat>& rvecs,
+                                                    const vector<Mat>& tvecs,
+                                                    const Mat& cameraMatrix,
+                                                    const Mat& distCoeffs,
+                                                    vector<float>& perViewErrors)
 {
     vector<Point2f> imagePoints2;
     int i, totalPoints = 0;
@@ -23,7 +24,7 @@ double camera_calibrator::computeReprojectionErrors(
     for(i = 0; i < (int)objectPoints.size(); i++)
     {
         projectPoints(Mat(objectPoints[i]), rvecs[i], tvecs[i],
-                      cameraMatrix, distCoeffs, imagePoints2);
+                          cameraMatrix, distCoeffs, imagePoints2);
         err = norm(Mat(imagePoints[i]), Mat(imagePoints2), NORM_L2);
         int n = (int)objectPoints[i].size();
         perViewErrors[i] = (float)std::sqrt(err*err/n);
@@ -222,7 +223,7 @@ void camera_calibrator::load_images(int _image_num, const string& path)
 	image_num = _image_num;
 	for (int i = 0; i <= image_num; i++)
     {
-		string filename = path + "IMG_" + std::to_string(i) +".jpg";
+		string filename = path + std::to_string(i) +".jpg";
 		cv::Mat image = cv::imread(filename, cv::IMREAD_GRAYSCALE);
 		image_size = image.size();
 		boardSize.height = rows_num;
@@ -269,14 +270,14 @@ void camera_calibrator::calibrate()
 	cout << "Dist Coeff\n" << dist_coeff <<endl;
 
     calcChessboardCorners(boardSize, square_size, world_points[0], pattern);
-    world_points.resize(camera_points.size(),world_points[0]);
+    world_points.resize(camera_points.size(), world_points[0]);
 }
 
 void camera_calibrator::undistort(const string& path, const string& undistort_path)
 {
 	for (int i = 0; i <= image_num; i++)
     {
-		string filename = path + "IMG_" + std::to_string(i) + ".jpg";
+		string filename = path + std::to_string(i) + ".jpg";
 		cv::Mat image = cv::imread(filename, cv::IMREAD_GRAYSCALE);
 		cv::Mat undistort_image;
 		cv::undistort(image, undistort_image, camera_matrix, dist_coeff);

@@ -20,7 +20,7 @@ using namespace Eigen;
 
 typedef pcl::PointXYZI PointType;
 pcl::PointCloud<PointType>::Ptr pc_surf(new pcl::PointCloud<PointType>);
-string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/new/1.json";
+string address = "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/hkust/s2.json";
 
 #define PI 3.14159265
 int max_svd_it = 30;
@@ -79,6 +79,8 @@ void surf_callback(const sensor_msgs::PointCloud2ConstPtr& msg)
 double compute_inlier(std::vector<double> residuals, double ratio)
 {
     std::sort(residuals.begin(), residuals.end());
+    // cout<<"inlier "<<residuals[floor(ratio * residuals.size())]<<endl;
+    // cout<<"max "<<residuals[residuals.size()-1]<<endl;
     return residuals[floor(ratio * residuals.size())];
 }
 
@@ -93,16 +95,16 @@ int main(int argc, char** argv)
     ros::Subscriber sub_surf = nh.subscribe<sensor_msgs::PointCloud2>("/pc2_surfaceN", 10000, surf_callback);
 
     pcl::PointCloud<PointType>::Ptr pc_src(new pcl::PointCloud<PointType>);
-    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/new/1.json");
+    *pc_src = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/mid40/hkust/s2.json");
     pcl::PointCloud<PointType>::Ptr pc_rough(new pcl::PointCloud<PointType>);
     pc_rough->points.resize(1e8);
     size_t cnt = 0;
 
     for (size_t i = 0; i < pc_src->points.size(); i++)
     {
-        if (pc_src->points[i].z > -0.5 && pc_src->points[i].z < 0.6 &&
-            pc_src->points[i].y > -0.3 && pc_src->points[i].y < 0.3 &&
-            pc_src->points[i].x > 0 && pc_src->points[i].x < 3)
+        if (pc_src->points[i].z > -0.8 && pc_src->points[i].z < 0 &&
+            pc_src->points[i].y > 0.3 && pc_src->points[i].y < 1.3 &&
+            pc_src->points[i].x > 3 && pc_src->points[i].x < 5)
             {
                 pc_rough->points[cnt].x = pc_src->points[i].x;
                 pc_rough->points[cnt].y = pc_src->points[i].y;
@@ -150,7 +152,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < pt_size; i++)
         {
             double tmp = svd_nor.dot(candidates[i] - center);
-            if (tmp < rej_val)
+            if (abs(tmp) < rej_val)
                 new_can.push_back(candidates[i]);
         }
 
