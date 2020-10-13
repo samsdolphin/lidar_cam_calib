@@ -29,4 +29,4 @@ add_executable(aruco src/aruco_detector.cpp)
 target_link_libraries(aruco ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
 
 add_executable(checkerboard src/checkerboard.cpp src/camera_calibration.cpp)
-target_link_libraries(checkerboard ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS})
+target_link_libraries(checkerboard ${catkin_LIBRARIES} ${OpenCV_LIBS})
