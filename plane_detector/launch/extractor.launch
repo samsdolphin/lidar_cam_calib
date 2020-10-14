@@ -1,0 +1,17 @@
+<launch>
+
+	<node pkg="unity_sw_mapping" type="unity_feature" name="unity_feature" output="screen"/>
+
+	<arg name="site" default="hkust"/> # site: hkust, lg02
+	<arg name="board_size" default="small"/> # board_size: large, small
+	<arg name="bag_name" default="right"/> # bag_name: left, middle, right
+
+	<node pkg="rosbag" type="play" name="rosbag" args="/home/sam/Desktop/lidar_camera/$(arg site)/$(arg board_size)/$(arg bag_name).bag"/>
+
+	<arg name="json_name" default="s3"/>
+
+	<node pkg="plane_detector" type="extract_plane" name="extract_plane" output="screen">
+	    <param name="data_write_path" type="string" value="$(find plane_detector)/data/$(arg site)/$(arg json_name).json"/>
+	</node>
+
+</launch>

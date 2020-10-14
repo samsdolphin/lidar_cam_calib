@@ -6,10 +6,10 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /Odometry1
         - /PointCloud21
         - /PointCloud22
         - /PointCloud23
+        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 1107
   - Class: rviz/Selection
@@ -60,40 +60,6 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: true
-    - Angle Tolerance: 0.100000001
-      Class: rviz/Odometry
-      Covariance:
-        Orientation:
-          Alpha: 0.5
-          Color: 255; 255; 127
-          Color Style: Unique
-          Frame: Local
-          Offset: 1
-          Scale: 1
-          Value: true
-        Position:
-          Alpha: 0.300000012
-          Color: 204; 51; 204
-          Scale: 1
-          Value: true
-        Value: true
-      Enabled: true
-      Keep: 100
-      Name: Odometry
-      Position Tolerance: 0.100000001
-      Shape:
-        Alpha: 1
-        Axes Length: 1
-        Axes Radius: 0.100000001
-        Color: 255; 25; 0
-        Head Length: 0.300000012
-        Head Radius: 0.100000001
-        Shaft Length: 1
-        Shaft Radius: 0.0500000007
-        Value: Arrow
-      Topic: /aft_mapped_to_init
-      Unreliable: false
       Value: true
     - Alpha: 0.5
       Autocompute Intensity Bounds: true
@@ -187,7 +153,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /svd_nor
+      Marker Topic: /detect_plane/svd_nor
       Name: MarkerArray
       Namespaces:
         my_namespace: true
@@ -218,25 +184,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.65487719
+      Distance: 8.72675514
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 3.96000981
-        Y: 0.978424549
-        Z: -0.855350494
+        X: 3.66690135
+        Y: 0.598249674
+        Z: -0.133293629
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.519797444
+      Pitch: 0.664797187
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.866721392
+      Yaw: 2.77538323
     Saved: ~
 Window Geometry:
   Displays:

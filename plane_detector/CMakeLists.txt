@@ -28,5 +28,8 @@ include_directories(
 
 catkin_package()
 
-add_executable(detect_plane src/plane_detector_node.cpp)
+add_executable(extract_plane src/plane_extractor.cpp)
+target_link_libraries(extract_plane ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+add_executable(detect_plane src/plane_detector.cpp)
 target_link_libraries(detect_plane ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS} ${PCL_LIBRARIES})
