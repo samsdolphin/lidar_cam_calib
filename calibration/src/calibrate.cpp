@@ -50,26 +50,26 @@ int main(int argc, char** argv)
     Matrix3d n_l, n_c, R, R_gt;
     for (int i = 0; i < 3; i++)
     {
-        n_l.col(i) = cam_nors[i];
-        n_c.col(i) = lidar_nors[i];
+        n_c.col(i) = cam_nors[i];
+        n_l.col(i) = lidar_nors[i];
     }
     R = n_c * n_l.inverse();
     Quaterniond q(R);
     q.normalized();
-    R_gt << 0, 0, 1, -1, 0, 0, 0, -1, 0;
+    R_gt << 0, -1, 0, 0, 0, -1, 1, 0, 0;
     Quaterniond q_gt(R_gt);
-    cout<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
-    cout<<q_gt.angularDistance(q)<<endl;
+    cout<<"q "<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
+    // cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
-    // Vector3d d_c(3.49818, 2.5973, 3.35969);
-    // Vector3d d_l(3.65261, 2.47498, 3.33524);
+    Vector3d d_c(3.49818, 2.5973, 3.35969);
+    Vector3d d_l(3.65261, 2.47498, 3.33524);
 
-    // Vector3d p0_l = n_l.transpose().inverse() * (-d_l);
-    // Vector3d p0_c = n_c.transpose().inverse() * (-d_c);
-    // cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
-    // cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
-    // Vector3d t = p0_l - q * p0_c;
-    // cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
+    Vector3d p0_l = n_l.transpose().inverse() * (d_l);
+    Vector3d p0_c = n_c.transpose().inverse() * (d_c);
+    // cout<<"P0_l "<<p0_l(0)<<" "<<p0_l(1)<<" "<<p0_l(2)<<endl;
+    // cout<<"P0_c "<<p0_c(0)<<" "<<p0_c(1)<<" "<<p0_c(2)<<endl;
+    Vector3d t = p0_c - q * p0_l;
+    cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
     ros::Rate loop_rate(1);
     while (ros::ok())
