@@ -97,8 +97,12 @@ int main(int argc, char** argv)
         
         JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
         Eigen::Vector3d svd_nor = svd.matrixV().col(2);
+        if (svd_nor(2) < 0)
+            svd_nor *= -1;
         n_cam.push_back(svd_nor);
+        cout<<"SVD "<<svd_nor(0)<<" "<<svd_nor(1)<<" "<<svd_nor(2)<<endl;
         d_cam.push_back(svd_nor.dot(center));
+        cout<<"d "<<svd_nor.dot(center)<<endl;
     }
 
     cout << "complete!" << endl;

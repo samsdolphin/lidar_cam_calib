@@ -1,9 +1,9 @@
 <launch>
-	<node pkg="marker_detector" name="checkerboard" type="checkerboard" output="screen">
-		<param name="camera_param_config" type="string" value="$(find marker_detector)/config/left.yaml"/>
-		<param name="image_path" type="string" value="$(find marker_detector)/fig/hkust/small/"/>
-		<param name="corner_height" type="int" value="6"/>
-		<param name="corner_width" type="int" value="9"/>
-		<param name="square_size" type="double" value="0.0685"/>
-	</node>
+    <node pkg="marker_detector" name="checkerboard" type="checkerboard" output="screen">
+        <param name="camera_param_config" type="string" value="$(find marker_detector)/config/left.yaml"/>
+        <param name="image_path" type="string" value="$(find marker_detector)/fig/hkust/small/"/>
+        <param name="corner_height" type="int" value="6"/>
+        <param name="corner_width" type="int" value="9"/>
+        <param name="square_size" type="double" value="0.0685"/>
+    </node>
 </launch>

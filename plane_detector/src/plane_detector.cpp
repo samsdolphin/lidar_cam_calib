@@ -125,6 +125,8 @@ int main(int argc, char** argv)
         
         JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
         Eigen::Vector3d svd_nor = svd.matrixV().col(2);
+        if (svd_nor(0) < 0)
+            svd_nor *= -1;
         double sig_val = svd.singularValues()[2];
         cout<<"candidate size "<<pt_size<<", singular value "<<sig_val<<endl;
 
@@ -200,8 +202,13 @@ int main(int argc, char** argv)
     
     JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
     Eigen::Vector3d svd_nor = svd.matrixV().col(2);
+    if (svd_nor(0) < 0)
+        svd_nor *= -1;
     double sig_val = svd.singularValues()[2];
     cout<<"final point size "<<pt_size<<", singular value "<<sig_val<<endl;
+    cout<<"SVD "<<svd_nor(0)<<" "<<svd_nor(1)<<" "<<svd_nor(2)<<endl;
+    double tmp = svd_nor.dot(center);
+    cout<<"d "<<tmp<<endl;
 
     visualization_msgs::MarkerArray marker_array;
     visualization_msgs::Marker marker;
