@@ -1,11 +1,12 @@
 <launch>
 
     <arg name="site" default="hkust"/> # site: hkust, lg02
-    <arg name="board_name" default="s3"/> # s1: left, s2: middle, s3: right
+    <arg name="board_size" default="large"/> # size: large, small
+    <arg name="board_name" default="middle"/> # name: left, middle, right
 
     <node pkg="plane_detector" type="detect_plane" name="detect_plane" output="screen">
-        <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/$(arg site)/$(arg board_name).json"/>
-        <param name="boundary_param" type="string" value="$(find plane_detector)/config/$(arg site)/$(arg board_name).yaml"/>
+        <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/$(arg site)/$(arg board_size)/$(arg board_name).json"/>
+        <param name="boundary_param" type="string" value="$(find plane_detector)/config/$(arg site)/$(arg board_size)/$(arg board_name).yaml"/>
         <param name="max_SVD_iteration" type="int" value="30"/>
         <param name="inlier_SVD_ratio" type="double" value="0.95"/>
         <param name="max_SVD_value" type="double" value="0.9"/>
