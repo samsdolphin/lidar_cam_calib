@@ -52,13 +52,15 @@ int main(int argc, char** argv)
 
     ros::Publisher pub_out = nh.advertise<sensor_msgs::PointCloud2>("/color_pt", 10000);
 
-    string camera_param = "/home/sam/catkin_ws/src/lidar_cam_calib/marker_dector/config/left.yaml";
-    string filename = "/home/sam/catkin_ws/src/lidar_cam_calib/marker_dector/fig/hkust/large/1.png";
+    string pointcloud_path, camera_param, image_path;
+    nh.getParam("pointcloud_path", pointcloud_path);
+    nh.getParam("camera_param", camera_param);
+    nh.getParam("image_path", image_path);
     cv::FileStorage param_reader(camera_param, cv::FileStorage::READ);
     cv::Mat camera_matrix, dist_coeff;
     param_reader["camera_matrix"] >> camera_matrix;
     param_reader["distortion_coefficients"] >> dist_coeff;
-    cv::Mat image = cv::imread(filename, cv::IMREAD_COLOR);
+    cv::Mat image = cv::imread(image_path, cv::IMREAD_COLOR);
 
     vector<Vector3d, aligned_allocator<Vector3d>> cam_nors, lidar_nors;
 
@@ -100,23 +102,20 @@ int main(int argc, char** argv)
     cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
     cv::Vec3d rvec, tvec;
-    cv::Mat R_mat;
-    float data_r = 
+    cv::Mat R_mat = cv::Mat_<double>(3, 3);
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             R_mat.at<double>(i, j) = R(i, j);
-cout<<"GOOD"<<endl;
+
     cv::Rodrigues(R_mat, rvec);
     for (int i = 0; i < 3; i++)
         tvec(i) = t(i);
-cout<<"GOOD"<<endl;
+
     pcl::PointCloud<PointType>::Ptr pc_src(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_out(new pcl::PointCloud<PointType>);
-    string pointcloud_path =
-        "/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/data/hkust/large/middle.json";
     *pc_src = read_pointcloud(pointcloud_path);
     size_t pc_size = pc_src->points.size();
-cout<<"GOOD"<<endl;
+
     vector<cv::Point3f> world_pts;
     vector<cv::Point2f> image_pts;
     for (size_t i = 0; i < pc_size; i++)
@@ -124,15 +123,13 @@ cout<<"GOOD"<<endl;
         Point3f p(pc_src->points[i].x, pc_src->points[i].y, pc_src->points[i].z);
         world_pts.push_back(p);
         projectPoints(Mat(world_pts), Mat(rvec), Mat(tvec), camera_matrix, dist_coeff, image_pts);
-        int r = image_pts[0].x;
-        int c = image_pts[0].y;
-        if (r >= 1080 || c >= 1920)
+        world_pts.clear();
+        int c = image_pts[0].x;
+        int r = image_pts[0].y;
+        if (r >= image.size().height || c >= image.size().width)
             continue;
-        cout<<"r "<<r<<" c "<<c<<endl;
+        
         Vec3b pixel = image.at<Vec3b>(r, c);
-        // uchar blue = pixel[0];
-        // uchar green = pixel[1];
-        // uchar red = pixel[2];
         PointType point;
         point.x = float (pc_src->points[i].x); 
         point.y = float (pc_src->points[i].y); 
@@ -140,7 +137,7 @@ cout<<"GOOD"<<endl;
         point.r = uint8_t (pixel[2]);
         point.g = uint8_t (pixel[1]);
         point.b = uint8_t (pixel[0]);
-        pc_out->push_back (point);
+        pc_out->push_back(point);
     }
 
     sensor_msgs::PointCloud2 laserCloudMsg;
@@ -152,7 +149,6 @@ cout<<"GOOD"<<endl;
     ros::Rate loop_rate(1);
     while (ros::ok())
     {
-        pub_out.publish(laserCloudMsg);
         ros::spinOnce();
         loop_rate.sleep();
     }
