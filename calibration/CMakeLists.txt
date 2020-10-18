@@ -15,14 +15,16 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(OpenCV REQUIRED)
 find_package(PCL REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(Ceres REQUIRED)
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${PCL_INCLUDE_DIRS}
+  ${CERES_INCLUDE_DIRS}
 )
 
 catkin_package()
 
 add_executable(calibrate_extrinsic src/calibrate.cpp)
-target_link_libraries(calibrate_extrinsic ${catkin_LIBRARIES} ${OpenCV_LIBS} ${aruco_LIBS} ${PCL_LIBRARIES})
+target_link_libraries(calibrate_extrinsic ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${PCL_LIBRARIES})

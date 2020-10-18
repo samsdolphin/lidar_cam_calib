@@ -18,6 +18,7 @@
 #include <eigen3/Eigen/SVD>
 #include <ceres/ceres.h>
 #include <ros/ros.h>
+#include "calibrate.hpp"
 
 typedef pcl::PointXYZRGB PointType;
 using namespace std;
@@ -43,6 +44,53 @@ pcl::PointCloud<PointType> read_pointcloud(std::string path)
 	file.close();
 	pc.points.resize(cnt);
 	return pc;
+}
+
+extrin_calib::extrin_calib()
+{
+    loss_function = new ceres::HuberLoss(0.1);
+    local_parameterization = new ceres::EigenQuaternionParameterization();
+    options.linear_solver_type = ceres::DENSE_SCHUR;
+    options.max_num_iterations = 1;
+    options.minimizer_progress_to_stdout = false;
+    options.check_gradients = false;
+    options.gradient_check_relative_precision = 1e-10;
+    for (int j = 0; j < 7; j++)
+        buffer[j] = 0;
+    buffer[3] = 1;
+}
+
+void extrin_calib::add_parameterblock()
+{
+    problem.AddParameterBlock(buffer, 4, local_parameterization);
+    problem.AddParameterBlock(buffer + 4, 3);
+}
+
+void extrin_calib::init(Quaterniond q, Vector3d t)
+{
+    buffer[0] = q.x();
+    buffer[1] = q.y();
+    buffer[2] = q.z();
+    buffer[3] = q.w();
+    buffer[4] = t(0);
+    buffer[5] = t(1);
+    buffer[6] = t(2);
+}
+
+void extrin_calib::add_residualblock(pcl::PointCloud<PointType>::Ptr pc,
+                                     Vector3d p0_c,
+                                     Vector3d n,
+                                     double d)
+{
+    size_t pt_size = pc->points.size();
+    for (size_t i = 0; i < pt_size; i++)
+    {
+        Vector3d p_l(pc->points[i].x, pc->points[i].y, pc->points[i].z);
+        ceres::CostFunction* cost_func;
+        cost_func = p2p::Create(p_l, p0_c, n, d);
+        block_id = problem.AddResidualBlock(cost_func, loss_function, buffer, buffer + 4);
+        residual_block_ids.push_back(block_id);
+    }
 }
 
 int main(int argc, char** argv)
@@ -91,7 +139,7 @@ int main(int argc, char** argv)
     R_gt << 0, -1, 0, 0, 0, -1, 1, 0, 0;
     Quaterniond q_gt(R_gt);
     cout<<"q "<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
-    // cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
+    cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
     Vector3d d_c(3.77202, 2.73181, 3.20342);
     Vector3d d_l(3.72805, 2.65214, 3.18523);
@@ -145,6 +193,32 @@ int main(int argc, char** argv)
     laserCloudMsg.header.stamp = ros::Time::now();
     laserCloudMsg.header.frame_id = "/camera_init";
     pub_out.publish(laserCloudMsg);
+
+    extrin_calib calib;
+    calib.add_parameterblock();
+    calib.init(q, t);
+    pcl::PointCloud<PointType>::Ptr pc_(new pcl::PointCloud<PointType>);
+    *pc_ = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/data/hkust/large/left_.json");
+    calib.add_residualblock(pc_, p0_c, n1_c, d_c(0));
+    *pc_ = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/data/hkust/large/middle_.json");
+    calib.add_residualblock(pc_, p0_c, n2_c, d_c(1));
+    *pc_ = read_pointcloud("/home/sam/catkin_ws/src/lidar_cam_calib/plane_detector/data/hkust/large/right_.json");
+    calib.add_residualblock(pc_, p0_c, n3_c, d_c(2));
+    ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
+
+    Eigen::Map<Eigen::Quaterniond> q_ = Eigen::Map<Eigen::Quaterniond>(calib.buffer);
+    Eigen::Map<Eigen::Vector3d> t_ = Eigen::Map<Eigen::Vector3d>(calib.buffer + 4);
+    q.w() = q_.w();
+    q.x() = q_.x();
+    q.y() = q_.y();
+    q.z() = q_.z();
+    t(0) = t_(0);
+    t(1) = t_(1);
+    t(2) = t_(2);
+
+    cout<<"q "<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
+    cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
+    cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
     ros::Rate loop_rate(1);
     while (ros::ok())

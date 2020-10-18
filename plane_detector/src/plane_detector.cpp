@@ -44,6 +44,19 @@ pcl::PointCloud<PointType> read_pointcloud(std::string path)
 	return pc;
 }
 
+void write_pointcloud(pcl::PointCloud<PointType>::Ptr pc, string path)
+{
+    std::ofstream file;
+    file.open(path, std::ofstream::trunc);
+    for (size_t i = 0; i < pc->points.size(); i++)
+    {
+        file << pc->points[i].x << " "
+             << pc->points[i].y << " "
+             << pc->points[i].z << "\n";
+    }
+    file.close();
+}
+
 double compute_inlier(std::vector<double> residuals, double ratio)
 {
     std::sort(residuals.begin(), residuals.end());
@@ -59,12 +72,13 @@ int main(int argc, char** argv)
     ros::Publisher pub_filt = nh.advertise<sensor_msgs::PointCloud2>("/filt_surf", 10000);
     ros::Publisher pub_nor = nh.advertise<visualization_msgs::MarkerArray>("svd_nor", 10000);
 
-    string pointcloud_path, boundary_param;
+    string pointcloud_path, write_path, boundary_param;
     cv::Mat boundary;
     int max_SVD_iteration;
     double inlier_SVD_ratio, max_SVD_value, max_circle_radius;
     
     nh.getParam("pointcloud_path", pointcloud_path);
+    nh.getParam("write_path", write_path);
     nh.getParam("boundary_param", boundary_param);
     nh.getParam("max_SVD_iteration", max_SVD_iteration);
     nh.getParam("inlier_SVD_ratio", inlier_SVD_ratio);
@@ -245,6 +259,7 @@ int main(int argc, char** argv)
         pc_filt->points[i].y = candidates[i](1);
         pc_filt->points[i].z = candidates[i](2);
     }
+    write_pointcloud(pc_filt, write_path);
 
     sensor_msgs::PointCloud2 laserCloudMsg;
     pcl::toROSMsg(*pc_src, laserCloudMsg);
