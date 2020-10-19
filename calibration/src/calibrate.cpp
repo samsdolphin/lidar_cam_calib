@@ -220,6 +220,42 @@ int main(int argc, char** argv)
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
     cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
+    R = q.toRotationMatrix();
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            R_mat.at<double>(i, j) = R(i, j);
+
+    cv::Rodrigues(R_mat, rvec);
+    for (int i = 0; i < 3; i++)
+        tvec(i) = t(i);
+
+    for (size_t i = 0; i < pc_size; i++)
+    {
+        Point3f p(pc_src->points[i].x, pc_src->points[i].y, pc_src->points[i].z);
+        world_pts.push_back(p);
+        projectPoints(Mat(world_pts), Mat(rvec), Mat(tvec), camera_matrix, dist_coeff, image_pts);
+        world_pts.clear();
+        int c = image_pts[0].x;
+        int r = image_pts[0].y;
+        if (r >= image.size().height || c >= image.size().width)
+            continue;
+        
+        Vec3b pixel = image.at<Vec3b>(r, c);
+        PointType point;
+        point.x = float (pc_src->points[i].x); 
+        point.y = float (pc_src->points[i].y); 
+        point.z = float (pc_src->points[i].z);
+        point.r = uint8_t (pixel[2]);
+        point.g = uint8_t (pixel[1]);
+        point.b = uint8_t (pixel[0]);
+        pc_out->push_back(point);
+    }
+
+    pcl::toROSMsg(*pc_out, laserCloudMsg);
+    laserCloudMsg.header.stamp = ros::Time::now();
+    laserCloudMsg.header.frame_id = "/camera_init";
+    pub_out.publish(laserCloudMsg);
+
     ros::Rate loop_rate(1);
     while (ros::ok())
     {

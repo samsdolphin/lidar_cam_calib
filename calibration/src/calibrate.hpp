@@ -50,7 +50,7 @@ struct p2p
         Eigen::Matrix<T, 3, 1> n = _n.template cast<T>();
         Eigen::Matrix<T, 3, 1> p_c;
         p_c = q * p + t - pt;
-        residual[0] = abs(T(_d) - n.dot(p_c));
+        residual[0] = n.dot(p_c);
         return true;
     };
 

@@ -2,8 +2,8 @@
 
     <arg name="site" default="hkust"/> # site: hkust, lg02
     <arg name="board_size" default="large"/> # size: large, small
-    <arg name="board_name" default="middle"/> # name: left, middle, right
-    <arg name="image_num" default="1"/> # num: 0, 1, 2
+    <arg name="board_name" default="right"/> # name: left, middle, right
+    <arg name="image_num" default="2"/> # num: 0, 1, 2
 
     <node pkg="calibration" type="calibrate_extrinsic" name="calibrate_extrinsic" output="screen">
         <param name="camera_param" type="string" value="$(find marker_detector)/config/left.yaml"/>
