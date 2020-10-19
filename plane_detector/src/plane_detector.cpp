@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     cout<<"final point size "<<pt_size<<", singular value "<<sig_val<<endl;
     cout<<"SVD "<<svd_nor(0)<<" "<<svd_nor(1)<<" "<<svd_nor(2)<<endl;
     double tmp = svd_nor.dot(center);
-    cout<<"d "<<tmp<<endl;
+    cout<<"distance "<<tmp<<endl;
 
     visualization_msgs::MarkerArray marker_array;
     visualization_msgs::Marker marker;

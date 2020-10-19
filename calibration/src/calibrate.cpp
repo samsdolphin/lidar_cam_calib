@@ -138,7 +138,6 @@ int main(int argc, char** argv)
     R = q.toRotationMatrix();
     R_gt << 0, -1, 0, 0, 0, -1, 1, 0, 0;
     Quaterniond q_gt(R_gt);
-    cout<<"q "<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
     Vector3d d_c(3.77202, 2.73181, 3.20342);
@@ -147,7 +146,9 @@ int main(int argc, char** argv)
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
     Vector3d t = p0_c - q * p0_l;
-    cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
+
+    Vector3d t_gt(0.0175, 0.0548, 0);
+    cout<<"linear distance "<<(t - t_gt).norm()<<endl;
 
     cv::Vec3d rvec, tvec;
     cv::Mat R_mat = cv::Mat_<double>(3, 3);
@@ -216,18 +217,17 @@ int main(int argc, char** argv)
     t(1) = t_(1);
     t(2) = t_(2);
 
-    cout<<"q "<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
-    cout<<"t "<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
+    cout<<"linear distance "<<(t - t_gt).norm()<<endl;
 
-    R = q.toRotationMatrix();
+    R = q_gt.toRotationMatrix();
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
             R_mat.at<double>(i, j) = R(i, j);
 
     cv::Rodrigues(R_mat, rvec);
     for (int i = 0; i < 3; i++)
-        tvec(i) = t(i);
+        tvec(i) = t_gt(i);
 
     for (size_t i = 0; i < pc_size; i++)
     {

@@ -14,20 +14,18 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(OpenCV REQUIRED)
-
-#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 find_package(Eigen3 REQUIRED)
+find_package(aruco REQUIRED)
+
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
 )
 
-find_package(aruco REQUIRED)
-
-#catkin_package()
+catkin_package()
 
 add_executable(aruco src/aruco_detector.cpp)
 target_link_libraries(aruco ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-add_executable(checkerboard src/checkerboard.cpp src/camera_calibration.cpp)
+add_executable(checkerboard src/checkerboard.cpp)
 target_link_libraries(checkerboard ${catkin_LIBRARIES} ${OpenCV_LIBS})
