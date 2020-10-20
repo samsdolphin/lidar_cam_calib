@@ -2,15 +2,13 @@
 
 	<node pkg="unity_sw_mapping" type="unity_feature" name="unity_feature" output="screen"/>
 
-	<arg name="site" default="hkust"/> # site: hkust, lg02
-	<arg name="board_size" default="large"/> # board_size: large, small
-	<arg name="bag_name" default="right"/> # bag_name: left, middle, right
 
-	<node pkg="rosbag" type="play" name="rosbag" args="/home/sam/Desktop/lidar_camera/$(arg site)/$(arg board_size)/$(arg bag_name).bag"/>
+	<arg name="bag_name" default="6"/>
+	<node pkg="rosbag" type="play" name="rosbag" args="/home/sam/lidar_camera/scene/$(arg bag_name).bag"/>
 
 
 	<node pkg="plane_detector" type="extract_plane" name="extract_plane" output="screen">
-	    <param name="data_write_path" type="string" value="$(find plane_detector)/data/$(arg site)/$(arg board_size)/$(arg bag_name).json"/>
+	    <param name="data_write_path" type="string" value="$(find plane_detector)/data/scene/$(arg bag_name).json"/>
 	</node>
 
 </launch>

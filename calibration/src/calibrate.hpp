@@ -22,22 +22,19 @@ public:
     void init(Eigen::Quaterniond, Eigen::Vector3d);
     void add_residualblock(pcl::PointCloud<pcl::PointXYZRGB>::Ptr,
                            Eigen::Vector3d,
-                           Eigen::Vector3d, double);
+                           Eigen::Vector3d);
 };
 
 struct p2p
 {
     Eigen::Vector3d _p, _pt, _n;
-    double _d;
 
     p2p(const Eigen::Vector3d& p,
         const Eigen::Vector3d& pt,
-        const Eigen::Vector3d& n,
-        const double& d):
+        const Eigen::Vector3d& n):
         _p(p),
         _pt(pt),
-        _n(n),
-        _d(d){};
+        _n(n){};
     
     template <typename T>
     bool operator()(const T* _q, const T* _t, T* residual) const
@@ -56,11 +53,10 @@ struct p2p
 
     static ceres::CostFunction* Create(const Eigen::Vector3d& p,
                                        const Eigen::Vector3d& pt,
-                                       const Eigen::Vector3d& n,
-                                       const double& d)
+                                       const Eigen::Vector3d& n)
     {
         return (new ceres::AutoDiffCostFunction<p2p, 1, 4, 3>(
-            new p2p(p, pt, n, d)));
+            new p2p(p, pt, n)));
     }
 };
 

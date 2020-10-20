@@ -17,11 +17,12 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "checker_board");
     ros::NodeHandle nh("~");
 
-    string camera_param, image_path;
+    string camera_param, image_path, normal_write_path;
     int corner_height, corner_width;
     double square_size;
     nh.getParam("camera_param_config", camera_param);
     nh.getParam("image_path", image_path);
+    nh.getParam("normal_write_path", normal_write_path);
     nh.getParam("corner_height", corner_height);
     nh.getParam("corner_width", corner_width);
     nh.getParam("square_size", square_size);
@@ -31,10 +32,10 @@ int main(int argc, char** argv)
     param_reader["camera_matrix"] >> camera_matrix;
     param_reader["distortion_coefficients"] >> dist_coeff;
 
-    vector<Vector3d> n_cam;
-    vector<double> d_cam;
+    vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
+    vector<int> valid_n;
 
-    for (int k = 0; k < 3; k++)
+    for (int k = 0; k < 18; k++)
     {
         string filename = image_path + to_string(k) + ".png";
         cout << "processing image " << k <<endl;
@@ -53,14 +54,13 @@ int main(int argc, char** argv)
 		if (found)
             cornerSubPix(gray_img, img_corners, Size(5, 5), Size(-1, -1),
                 TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 100, 0.01));
+        else
+            continue;
 
-        if (found)
-        {
-            for (int i = 0; i < boardSize.height; i++)
-                for (int j = 0; j < boardSize.width; j++)
-                    world_corners.push_back(Point3f(float(j * square_size),
-                                                    float(i * square_size), 0));
-        }
+        for (int i = 0; i < boardSize.height; i++)
+            for (int j = 0; j < boardSize.width; j++)
+                world_corners.push_back(Point3f(float(j * square_size),
+                                                float(i * square_size), 0));
 
         solvePnP(world_corners, img_corners, camera_matrix, dist_coeff, rvec, tvec);
 
@@ -104,9 +104,24 @@ int main(int argc, char** argv)
             svd_nor *= -1;
         n_cam.push_back(svd_nor);
         cout<<"SVD "<<svd_nor(0)<<" "<<svd_nor(1)<<" "<<svd_nor(2)<<endl;
-        d_cam.push_back(svd_nor.dot(center));
+        center_cam.push_back(center);
         cout<<"d "<<svd_nor.dot(center)<<endl;
+        valid_n.push_back(k);
     }
+
+    std::ofstream file;
+    file.open(normal_write_path, std::ofstream::trunc);
+    for (size_t i = 0; i < n_cam.size(); i++)
+    {
+        file << valid_n[i] << " "
+             << n_cam[i](0) << " "
+             << n_cam[i](1) << " "
+             << n_cam[i](2) << " "
+             << center_cam[i](0) << " "
+             << center_cam[i](1) << " "
+             << center_cam[i](2) << "\n";
+    }
+    file.close();
 
     cout << "complete!" << endl;
 
