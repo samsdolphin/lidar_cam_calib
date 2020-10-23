@@ -1,0 +1,7 @@
+%YAML:1.0
+---
+boundary: !!opencv-matrix
+   rows: 3
+   cols: 2
+   dt: d
+   data: [6, 8, -1, 0.5, -0.8, -0.2]

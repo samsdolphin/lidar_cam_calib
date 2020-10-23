@@ -158,6 +158,7 @@ int main(int argc, char** argv)
                 new_can.push_back(candidates[i]);
         }
 
+        residuals.clear();
         candidates.clear();
         candidates = new_can;
         new_can.clear();
@@ -190,6 +191,59 @@ int main(int argc, char** argv)
         pub_nor.publish(marker_array);
 
         if (sig_val < max_SVD_value)
+        {
+            for (size_t i = 0; i < pt_size; i++)
+                if ((candidates[i] - center).norm() < max_circle_radius)
+                    new_can.push_back(candidates[i]);
+
+            candidates.clear();
+            candidates = new_can;
+            new_can.clear();
+            break;
+        }
+    }
+
+    for (int it = 0; it < max_SVD_iteration; it++)
+    {
+        center.setZero();
+        size_t pt_size = candidates.size();
+
+        for (size_t i = 0; i < pt_size; i++)
+            center += candidates[i];
+        center /= pt_size;
+
+        Eigen::MatrixXd A(pt_size, 3);
+
+        for (size_t i = 0; i < pt_size; i++)
+            A.row(i) = (candidates[i] - center).transpose();
+        
+        JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
+        Eigen::Vector3d svd_nor = svd.matrixV().col(2);
+        if (svd_nor(0) < 0)
+            svd_nor *= -1;
+        double sig_val = svd.singularValues()[2];
+        cout<<"candidate size "<<pt_size<<", singular value "<<sig_val<<endl;
+
+        for (size_t i = 0; i < pt_size; i++)
+        {
+            double tmp = svd_nor.dot(candidates[i] - center);
+            residuals.push_back(abs(tmp));
+        }
+        double rej_val = compute_inlier(residuals, inlier_SVD_ratio);
+
+        for (size_t i = 0; i < pt_size; i++)
+        {
+            double tmp = svd_nor.dot(candidates[i] - center);
+            if (abs(tmp) < rej_val)
+                new_can.push_back(candidates[i]);
+        }
+
+        residuals.clear();
+        candidates.clear();
+        candidates = new_can;
+        new_can.clear();
+
+        if (sig_val <= 0.1)
         {
             for (size_t i = 0; i < pt_size; i++)
                 if ((candidates[i] - center).norm() < max_circle_radius)

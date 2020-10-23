@@ -6,5 +6,7 @@
         <param name="corner_height" type="int" value="8"/>
         <param name="corner_width" type="int" value="12"/>
         <param name="square_size" type="double" value="0.08"/>
+        <param name="image_num" type="int" value="22"/>
+        <param name="reproject_err" type="double" value="0.2"/>
     </node>
 </launch>

@@ -25,6 +25,12 @@ using namespace std;
 using namespace Eigen;
 using namespace cv;
 
+double compute_inlier(std::vector<double> residuals, double ratio)
+{
+    std::sort(residuals.begin(), residuals.end());
+    return residuals[floor(ratio * residuals.size())];
+}
+
 pcl::PointCloud<PointType> read_pointcloud(std::string path)
 {
 	pcl::PointCloud<PointType> pc;
@@ -79,9 +85,12 @@ void extrin_calib::init(Quaterniond q, Vector3d t)
 
 void extrin_calib::add_residualblock(pcl::PointCloud<PointType>::Ptr pc,
                                      Vector3d p0_c,
-                                     Vector3d n)
+                                     Vector3d n,
+                                     Quaterniond q,
+                                     Vector3d t)
 {
     size_t pt_size = pc->points.size();
+    double pro_err = 0;
     for (size_t i = 0; i < pt_size; i++)
     {
         Vector3d p_l(pc->points[i].x, pc->points[i].y, pc->points[i].z);
@@ -89,7 +98,9 @@ void extrin_calib::add_residualblock(pcl::PointCloud<PointType>::Ptr pc,
         cost_func = p2p::Create(p_l, p0_c, n);
         block_id = problem.AddResidualBlock(cost_func, loss_function, buffer, buffer + 4);
         residual_block_ids.push_back(block_id);
+        pro_err += abs(n.dot(q * p_l + t - p0_c));
     }
+    cout<<"average projection error "<<pro_err/pt_size<<endl;
 }
 
 int main(int argc, char** argv)
@@ -166,74 +177,56 @@ int main(int argc, char** argv)
     *pc_src = read_pointcloud(scene_pointcloud);
     size_t pc_size = pc_src->points.size();
 
+    for (int iter = 0; iter < 1; iter++)
+    {
+        extrin_calib calib;
+        calib.add_parameterblock();
+        calib.init(q, t);
+
+        std::fstream file;
+        file.open(normal_path);
+        vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
+        vector<int> valid_n;
+        int num;
+        double nx, ny, nz, cx, cy, cz;
+
+        while (!file.eof())
+        {
+            file >> num >> nx >> ny >> nz >> cx >> cy >> cz;
+            valid_n.push_back(num);
+            n_cam.push_back(Vector3d(nx, ny, nz));
+            center_cam.push_back(Vector3d(cx, cy, cz));
+        }
+        file.close();
+        valid_n.pop_back();
+        n_cam.pop_back();
+        center_cam.pop_back();
+
+        for (size_t i = 0; i < valid_n.size(); i++)
+        {
+            pcl::PointCloud<PointType>::Ptr pc_(new pcl::PointCloud<PointType>);
+            *pc_ = read_pointcloud(pointcloud_path + to_string(valid_n[i]) + ".json");
+            calib.add_residualblock(pc_, center_cam[i], n_cam[i], q, t);
+        }
+        ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
+        cout<<calib.summary.BriefReport()<<endl;
+
+        Eigen::Map<Eigen::Quaterniond> q_ = Eigen::Map<Eigen::Quaterniond>(calib.buffer);
+        Eigen::Map<Eigen::Vector3d> t_ = Eigen::Map<Eigen::Vector3d>(calib.buffer + 4);
+        q.w() = q_.w();
+        q.x() = q_.x();
+        q.y() = q_.y();
+        q.z() = q_.z();
+        t(0) = t_(0);
+        t(1) = t_(1);
+        t(2) = t_(2);
+        cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
+        cout<<"linear distance "<<(t - t_gt).norm()<<endl;
+        cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
+    }
+
     vector<cv::Point3f> world_pts;
     vector<cv::Point2f> image_pts;
-    // for (size_t i = 0; i < pc_size; i++)
-    // {
-    //     Point3f p(pc_src->points[i].x, pc_src->points[i].y, pc_src->points[i].z);
-    //     world_pts.push_back(p);
-    //     projectPoints(Mat(world_pts), Mat(rvec), Mat(tvec), camera_matrix, dist_coeff, image_pts);
-    //     world_pts.clear();
-    //     int c = image_pts[0].x;
-    //     int r = image_pts[0].y;
-    //     if (r >= image.size().height || c >= image.size().width)
-    //         continue;
-        
-    //     Vec3b pixel = image.at<Vec3b>(r, c);
-    //     PointType point;
-    //     point.x = float (pc_src->points[i].x); 
-    //     point.y = float (pc_src->points[i].y); 
-    //     point.z = float (pc_src->points[i].z);
-    //     point.r = uint8_t (pixel[2]);
-    //     point.g = uint8_t (pixel[1]);
-    //     point.b = uint8_t (pixel[0]);
-    //     pc_out->push_back(point);
-    // }
-
-    sensor_msgs::PointCloud2 laserCloudMsg;
-    // pcl::toROSMsg(*pc_out, laserCloudMsg);
-    // laserCloudMsg.header.stamp = ros::Time::now();
-    // laserCloudMsg.header.frame_id = "/camera_init";
-    // pub_out.publish(laserCloudMsg);
-
-    extrin_calib calib;
-    calib.add_parameterblock();
-    calib.init(q, t);
-
-    std::fstream file;
-	file.open(normal_path);
-    vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
-    vector<int> valid_n;
-    int num;
-    double nx, ny, nz, cx, cy, cz;
-    while (!file.eof())
-	{
-		file >> num >> nx >> ny >> nz >> cx >> cy >> cz;
-        valid_n.push_back(num);
-        n_cam.push_back(Vector3d(nx, ny, nz));
-        center_cam.push_back(Vector3d(cx, cy, cz));
-	}
-	file.close();
-    for (size_t i = 0; i < valid_n.size(); i++)
-    {
-        pcl::PointCloud<PointType>::Ptr pc_(new pcl::PointCloud<PointType>);
-        *pc_ = read_pointcloud(pointcloud_path + to_string(valid_n[i]) + ".json");
-        calib.add_residualblock(pc_, center_cam[i], n_cam[i]);
-    }
-    ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
-
-    Eigen::Map<Eigen::Quaterniond> q_ = Eigen::Map<Eigen::Quaterniond>(calib.buffer);
-    Eigen::Map<Eigen::Vector3d> t_ = Eigen::Map<Eigen::Vector3d>(calib.buffer + 4);
-    q.w() = q_.w();
-    q.x() = q_.x();
-    q.y() = q_.y();
-    q.z() = q_.z();
-    t(0) = t_(0);
-    t(1) = t_(1);
-    t(2) = t_(2);
-
-    cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
-    cout<<"linear distance "<<(t - t_gt).norm()<<endl;
 
     R = q.toRotationMatrix();
     for (int i = 0; i < 3; i++)
@@ -266,6 +259,7 @@ int main(int argc, char** argv)
         pc_out->push_back(point);
     }
 
+    sensor_msgs::PointCloud2 laserCloudMsg;
     pcl::toROSMsg(*pc_out, laserCloudMsg);
     laserCloudMsg.header.stamp = ros::Time::now();
     laserCloudMsg.header.frame_id = "/camera_init";

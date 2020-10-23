@@ -22,6 +22,8 @@ public:
     void init(Eigen::Quaterniond, Eigen::Vector3d);
     void add_residualblock(pcl::PointCloud<pcl::PointXYZRGB>::Ptr,
                            Eigen::Vector3d,
+                           Eigen::Vector3d,
+                           Eigen::Quaterniond,
                            Eigen::Vector3d);
 };
 
@@ -47,7 +49,7 @@ struct p2p
         Eigen::Matrix<T, 3, 1> n = _n.template cast<T>();
         Eigen::Matrix<T, 3, 1> p_c;
         p_c = q * p + t - pt;
-        residual[0] = n.dot(p_c);
+        residual[0] = abs(n.dot(p_c));
         return true;
     };
 

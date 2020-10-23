@@ -18,14 +18,16 @@ int main(int argc, char** argv)
     ros::NodeHandle nh("~");
 
     string camera_param, image_path, normal_write_path;
-    int corner_height, corner_width;
-    double square_size;
+    int corner_height, corner_width, image_num;
+    double square_size, reproject_err;
     nh.getParam("camera_param_config", camera_param);
     nh.getParam("image_path", image_path);
     nh.getParam("normal_write_path", normal_write_path);
     nh.getParam("corner_height", corner_height);
     nh.getParam("corner_width", corner_width);
     nh.getParam("square_size", square_size);
+    nh.getParam("image_num", image_num);
+    nh.getParam("reproject_err", reproject_err);
 
     cv::FileStorage param_reader(camera_param, cv::FileStorage::READ);
     cv::Mat camera_matrix, dist_coeff;
@@ -35,7 +37,7 @@ int main(int argc, char** argv)
     vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
     vector<int> valid_n;
 
-    for (int k = 0; k < 18; k++)
+    for (int k = 0; k <= image_num; k++)
     {
         string filename = image_path + to_string(k) + ".png";
         cout << "processing image " << k <<endl;
@@ -44,7 +46,7 @@ int main(int argc, char** argv)
 		cv::cvtColor(image, gray_img, CV_BGR2GRAY);
         cv::Size boardSize(corner_width, corner_height);
 		vector<cv::Point3f> world_corners;
-		vector<cv::Point2f> img_corners;
+		vector<cv::Point2f> img_corners, repro_corners;
         
 		cv::Vec3d rvec, tvec;
 
@@ -63,6 +65,15 @@ int main(int argc, char** argv)
                                                 float(i * square_size), 0));
 
         solvePnP(world_corners, img_corners, camera_matrix, dist_coeff, rvec, tvec);
+        projectPoints(Mat(world_corners), Mat(rvec), Mat(tvec),
+                      camera_matrix, dist_coeff, repro_corners);
+        double err = norm(Mat(img_corners), Mat(repro_corners), NORM_L2);
+        err = sqrt(err * err / world_corners.size());
+        if (err < reproject_err)
+        {
+            cout << "reprojected error " << err << endl;
+            valid_n.push_back(k);
+        }
 
         cv::Mat R;
         cv::Rodrigues(rvec, R);
@@ -103,15 +114,12 @@ int main(int argc, char** argv)
         if (svd_nor(2) < 0)
             svd_nor *= -1;
         n_cam.push_back(svd_nor);
-        cout<<"SVD "<<svd_nor(0)<<" "<<svd_nor(1)<<" "<<svd_nor(2)<<endl;
         center_cam.push_back(center);
-        cout<<"d "<<svd_nor.dot(center)<<endl;
-        valid_n.push_back(k);
     }
 
     std::ofstream file;
     file.open(normal_write_path, std::ofstream::trunc);
-    for (size_t i = 0; i < n_cam.size(); i++)
+    for (size_t i = 0; i < valid_n.size(); i++)
     {
         file << valid_n[i] << " "
              << n_cam[i](0) << " "
