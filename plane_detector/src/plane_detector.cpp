@@ -97,14 +97,12 @@ int main(int argc, char** argv)
 
     for (size_t i = 0; i < pc_src->points.size(); i++)
     {
-        if (
-            pc_src->points[i].x > boundary.at<double>(0, 0) &&
+        if (pc_src->points[i].x > boundary.at<double>(0, 0) &&
             pc_src->points[i].x < boundary.at<double>(0, 1) &&
             pc_src->points[i].y > boundary.at<double>(1, 0) &&
             pc_src->points[i].y < boundary.at<double>(1, 1) &&
             pc_src->points[i].z > boundary.at<double>(2, 0) &&
-            pc_src->points[i].z < boundary.at<double>(2, 1)
-            )
+            pc_src->points[i].z < boundary.at<double>(2, 1))
             {
                 pc_rough->points[cnt].x = pc_src->points[i].x;
                 pc_rough->points[cnt].y = pc_src->points[i].y;

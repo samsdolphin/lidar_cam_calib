@@ -43,7 +43,7 @@ int main(int argc, char** argv)
         string filename = image_path + to_string(k) + ".png";
         cout << "processing image " << k <<endl;
 		cv::Mat image = cv::imread(filename, cv::IMREAD_COLOR);
-        cv::Mat gray_img, draw_image;
+        cv::Mat gray_img;
 		cv::cvtColor(image, gray_img, CV_BGR2GRAY);
         cv::Size boardSize(corner_width, corner_height);
 		vector<cv::Point3f> world_corners;
@@ -59,6 +59,10 @@ int main(int argc, char** argv)
                 TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 100, 0.01));
         else
             continue;
+
+        drawChessboardCorners(image, boardSize, Mat(img_corners), found);
+        filename = image_path + "marked/" + to_string(k) + ".png";
+        imwrite(filename, image);
 
         for (int i = 0; i < boardSize.height; i++)
             for (int j = 0; j < boardSize.width; j++)

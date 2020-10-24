@@ -54,7 +54,7 @@ pcl::PointCloud<PointType> read_pointcloud(std::string path)
 
 extrin_calib::extrin_calib()
 {
-    loss_function = new ceres::HuberLoss(0.5);
+    loss_function = new ceres::HuberLoss(0.1);
     local_parameterization = new ceres::EigenQuaternionParameterization();
     options.linear_solver_type = ceres::DENSE_SCHUR;
     options.max_num_iterations = 100;
@@ -124,16 +124,16 @@ int main(int argc, char** argv)
 
     vector<Vector3d, aligned_allocator<Vector3d>> cam_nors, lidar_nors;
 
-    Vector3d n1_c(-0.272656, 0.723249, 0.634483);
-    Vector3d n2_c(0.352557, 0.770933, 0.53044);
-    Vector3d n3_c(0.00794265, 0.774883, 0.632055);
+    Vector3d n1_c(0.586455, 0.207063, 0.783068);
+    Vector3d n2_c(-0.0134726, 0.901135, 0.433329);
+    Vector3d n3_c(-0.824312, 0.269763, 0.497733);
     cam_nors.push_back(n1_c);
     cam_nors.push_back(n2_c);
     cam_nors.push_back(n3_c);
 
-    Vector3d n1_l(0.639109, 0.266962, -0.721298);
-    Vector3d n2_l(0.52839, -0.34726, -0.774735);
-    Vector3d n3_l(0.629665, -0.00584401, -0.776845);
+    Vector3d n1_l(0.784437, -0.587135, -0.199829);
+    Vector3d n2_l(0.437768, 0.0190994, -0.898885);
+    Vector3d n3_l(0.492161, 0.828709, -0.266492);
     lidar_nors.push_back(n1_l);
     lidar_nors.push_back(n2_l);
     lidar_nors.push_back(n3_l);
@@ -152,8 +152,8 @@ int main(int argc, char** argv)
     Quaterniond q_gt(R_gt);
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
-    Vector3d d_c(4.33844, 3.79384, 4.41193);
-    Vector3d d_l(4.29866, 3.67984, 4.30644);
+    Vector3d d_c(3.77202, 2.73181, 3.20342);
+    Vector3d d_l(3.71667, 2.67685, 3.18821);
 
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
@@ -164,13 +164,6 @@ int main(int argc, char** argv)
 
     cv::Vec3d rvec, tvec;
     cv::Mat R_mat = cv::Mat_<double>(3, 3);
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            R_mat.at<double>(i, j) = R(i, j);
-
-    cv::Rodrigues(R_mat, rvec);
-    for (int i = 0; i < 3; i++)
-        tvec(i) = t(i);
 
     pcl::PointCloud<PointType>::Ptr pc_src(new pcl::PointCloud<PointType>);
     pcl::PointCloud<PointType>::Ptr pc_out(new pcl::PointCloud<PointType>);
@@ -222,6 +215,7 @@ int main(int argc, char** argv)
         t(2) = t_(2);
         cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
         cout<<"linear distance "<<(t - t_gt).norm()<<endl;
+        cout<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
         cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
     }
 
