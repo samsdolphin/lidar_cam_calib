@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="board_name" default="14"/>
+    <arg name="board_name" default="11"/>
 
     <node pkg="plane_detector" type="detect_plane" name="detect_plane" output="screen">
         <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/calib/$(arg board_name).json"/>

@@ -54,10 +54,10 @@ pcl::PointCloud<PointType> read_pointcloud(std::string path)
 
 extrin_calib::extrin_calib()
 {
-    loss_function = new ceres::HuberLoss(0.1);
+    loss_function = new ceres::HuberLoss(0.5);
     local_parameterization = new ceres::EigenQuaternionParameterization();
     options.linear_solver_type = ceres::DENSE_SCHUR;
-    options.max_num_iterations = 1;
+    options.max_num_iterations = 100;
     options.minimizer_progress_to_stdout = false;
     options.check_gradients = false;
     options.gradient_check_relative_precision = 1e-10;
@@ -124,16 +124,16 @@ int main(int argc, char** argv)
 
     vector<Vector3d, aligned_allocator<Vector3d>> cam_nors, lidar_nors;
 
-    Vector3d n1_c(0.586455, 0.207063, 0.783068);
-    Vector3d n2_c(-0.0134726, 0.901135, 0.433329);
-    Vector3d n3_c(-0.824312, 0.269763, 0.497733);
+    Vector3d n1_c(-0.272656, 0.723249, 0.634483);
+    Vector3d n2_c(0.352557, 0.770933, 0.53044);
+    Vector3d n3_c(0.00794265, 0.774883, 0.632055);
     cam_nors.push_back(n1_c);
     cam_nors.push_back(n2_c);
     cam_nors.push_back(n3_c);
 
-    Vector3d n1_l(0.786101, -0.584967, -0.199649);
-    Vector3d n2_l(0.432133, 0.0192129, -0.901605);
-    Vector3d n3_l(0.491403, 0.828714, -0.267874);
+    Vector3d n1_l(0.639109, 0.266962, -0.721298);
+    Vector3d n2_l(0.52839, -0.34726, -0.774735);
+    Vector3d n3_l(0.629665, -0.00584401, -0.776845);
     lidar_nors.push_back(n1_l);
     lidar_nors.push_back(n2_l);
     lidar_nors.push_back(n3_l);
@@ -152,8 +152,8 @@ int main(int argc, char** argv)
     Quaterniond q_gt(R_gt);
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
-    Vector3d d_c(3.77202, 2.73181, 3.20342);
-    Vector3d d_l(3.72805, 2.65214, 3.18523);
+    Vector3d d_c(4.33844, 3.79384, 4.41193);
+    Vector3d d_l(4.29866, 3.67984, 4.30644);
 
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
@@ -188,11 +188,11 @@ int main(int argc, char** argv)
         vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
         vector<int> valid_n;
         int num;
-        double nx, ny, nz, cx, cy, cz;
+        double nx, ny, nz, cx, cy, cz, d;
 
         while (!file.eof())
         {
-            file >> num >> nx >> ny >> nz >> cx >> cy >> cz;
+            file >> num >> nx >> ny >> nz >> cx >> cy >> cz >> d;
             valid_n.push_back(num);
             n_cam.push_back(Vector3d(nx, ny, nz));
             center_cam.push_back(Vector3d(cx, cy, cz));

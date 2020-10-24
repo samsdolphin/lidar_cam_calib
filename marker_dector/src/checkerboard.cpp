@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 
     vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
     vector<int> valid_n;
+    vector<double> dis;
 
     for (int k = 0; k <= image_num; k++)
     {
@@ -115,6 +116,7 @@ int main(int argc, char** argv)
             svd_nor *= -1;
         n_cam.push_back(svd_nor);
         center_cam.push_back(center);
+        dis.push_back(abs(svd_nor.dot(center)));
     }
 
     std::ofstream file;
@@ -127,7 +129,8 @@ int main(int argc, char** argv)
              << n_cam[i](2) << " "
              << center_cam[i](0) << " "
              << center_cam[i](1) << " "
-             << center_cam[i](2) << "\n";
+             << center_cam[i](2) << " "
+             << dis[i] << "\n";
     }
     file.close();
 
