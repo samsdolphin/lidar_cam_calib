@@ -2,7 +2,7 @@
     <node pkg="marker_detector" name="checkerboard" type="checkerboard" output="screen">
         <param name="camera_param_config" type="string" value="$(find marker_detector)/config/left.yaml"/>
         <param name="image_path" type="string" value="$(find marker_detector)/fig/"/>
-        <param name="normal_write_path" type="string" value="$(find marker_detector)/fig/normal.json"/>
+        <param name="normal_write_path" type="string" value="$(find marker_detector)/fig/init_c.json"/>
         <param name="corner_height" type="int" value="8"/>
         <param name="corner_width" type="int" value="12"/>
         <param name="square_size" type="double" value="0.08"/>

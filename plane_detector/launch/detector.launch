@@ -1,11 +1,12 @@
 <launch>
 
-    <arg name="board_name" default="4"/>
-
     <node pkg="plane_detector" type="detect_plane" name="detect_plane" output="screen">
-        <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/calib/$(arg board_name).json"/>
-        <param name="write_path" type="string" value="$(find plane_detector)/data/filter/$(arg board_name).json"/>
-        <param name="boundary_param" type="string" value="$(find plane_detector)/config/$(arg board_name).yaml"/>
+        <param name="board_num" type="int" value="0"/>
+        <param name="write_all" type="bool" value="false"/>
+        <param name="write_all_path" type="string" value="$(find plane_detector)/data/filter/init_l.json"/>
+        <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/calib/"/>
+        <param name="write_path" type="string" value="$(find plane_detector)/data/filter/"/>
+        <param name="boundary_param" type="string" value="$(find plane_detector)/config/"/>
         <param name="max_SVD_iteration" type="int" value="30"/>
         <param name="inlier_SVD_ratio" type="double" value="0.95"/>
         <param name="max_SVD_value" type="double" value="0.9"/>

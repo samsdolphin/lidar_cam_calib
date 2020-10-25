@@ -157,7 +157,7 @@ Visualization Manager:
       Name: MarkerArray
       Namespaces:
         my_namespace: true
-      Queue Size: 100
+      Queue Size: 1
       Value: true
   Enabled: true
   Global Options:

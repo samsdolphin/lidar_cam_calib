@@ -110,12 +110,18 @@ int main(int argc, char** argv)
 
     ros::Publisher pub_out = nh.advertise<sensor_msgs::PointCloud2>("/color_pt", 10000);
 
-    string pointcloud_path, camera_param, image_path, normal_path, scene_pointcloud;
+    string pointcloud_path, camera_param, image_path, normal_path, scene_pointcloud, init_c, init_l;
+    int ln, mn, rn;
+    nh.getParam("init_ln", ln);
+    nh.getParam("init_mn", mn);
+    nh.getParam("init_rn", rn);
     nh.getParam("pointcloud_path", pointcloud_path);
     nh.getParam("scene_pointcloud", scene_pointcloud);
     nh.getParam("camera_param", camera_param);
     nh.getParam("image_path", image_path);
     nh.getParam("normal_path", normal_path);
+    nh.getParam("init_camera_path", init_c);
+    nh.getParam("init_lidar_path", init_l);
     cv::FileStorage param_reader(camera_param, cv::FileStorage::READ);
     cv::Mat camera_matrix, dist_coeff;
     param_reader["camera_matrix"] >> camera_matrix;
@@ -123,23 +129,36 @@ int main(int argc, char** argv)
     cv::Mat image = cv::imread(image_path, cv::IMREAD_COLOR);
 
     vector<Vector3d, aligned_allocator<Vector3d>> cam_nors, lidar_nors;
+    vector<double> d_cs, d_ls;
 
-    Vector3d n1_c(0.586455, 0.207063, 0.783068);
-    Vector3d n2_c(-0.0134726, 0.901135, 0.433329);
-    Vector3d n3_c(-0.824312, 0.269763, 0.497733);
-    cam_nors.push_back(n1_c);
-    cam_nors.push_back(n2_c);
-    cam_nors.push_back(n3_c);
-
-    Vector3d n1_l(0.784437, -0.587135, -0.199829);
-    Vector3d n2_l(0.437768, 0.0190994, -0.898885);
-    Vector3d n3_l(0.492161, 0.828709, -0.266492);
-    lidar_nors.push_back(n1_l);
-    lidar_nors.push_back(n2_l);
-    lidar_nors.push_back(n3_l);
+    std::fstream file;
+    file.open(init_c);
+    double nx, ny, nz, cx, cy, cz, d;
+    int num;
+    while (!file.eof())
+    {
+        file >> num >> nx >> ny >> nz >> cx >> cy >> cz >> d;
+        if (num == ln || num == mn || num == rn)
+        {
+            cam_nors.push_back(Vector3d(nx, ny, nz));
+            d_cs.push_back(d);
+        }
+    }
+    file.close();
+    file.open(init_l);
+    while (!file.eof())
+    {
+        file >> num >> nx >> ny >> nz >> d;
+        if (num == ln || num == mn || num == rn)
+        {
+            lidar_nors.push_back(Vector3d(nx, ny, nz));
+            d_ls.push_back(d);
+        }
+    }
+    file.close();
 
     Matrix3d n_l, n_c, R, R_gt;
-    for (int i = 0; i < 3; i++)
+    for (size_t i = 0; i < 3; i++)
     {
         n_c.col(i) = cam_nors[i];
         n_l.col(i) = lidar_nors[i];
@@ -152,8 +171,8 @@ int main(int argc, char** argv)
     Quaterniond q_gt(R_gt);
     cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
 
-    Vector3d d_c(3.77202, 2.73181, 3.20342);
-    Vector3d d_l(3.71667, 2.67685, 3.18821);
+    Vector3d d_c(d_cs[0], d_cs[1], d_cs[2]);
+    Vector3d d_l(d_ls[0], d_ls[1], d_ls[2]);
 
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
@@ -180,8 +199,6 @@ int main(int argc, char** argv)
         file.open(normal_path);
         vector<Vector3d, aligned_allocator<Vector3d>> n_cam, center_cam;
         vector<int> valid_n;
-        int num;
-        double nx, ny, nz, cx, cy, cz, d;
 
         while (!file.eof())
         {
