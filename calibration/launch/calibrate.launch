@@ -1,8 +1,8 @@
 <launch>
 
-    <arg name="scene_num" default="6"/>
+    <arg name="scene_num" default="7"/>
     <node pkg="calibration" type="calibrate_extrinsic" name="calibrate_extrinsic" output="screen">
-        <param name="camera_param" type="string" value="$(find marker_detector)/config/left.yaml"/>
+        <param name="camera_param" type="string" value="$(find marker_detector)/config/gray.yaml"/>
         <param name="image_path" type="string" value="$(find marker_detector)/fig/scene/$(arg scene_num).png"/>
         <param name="scene_pointcloud" type="string" value="$(find plane_detector)/data/scene/$(arg scene_num).json"/>
         <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/filter/"/>

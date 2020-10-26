@@ -61,8 +61,8 @@ int main(int argc, char** argv)
             continue;
 
         drawChessboardCorners(image, boardSize, Mat(img_corners), found);
-        filename = image_path + "marked/" + to_string(k) + ".png";
-        imwrite(filename, image);
+        filename = image_path + "gray/" + "IMG_" + to_string(k) + ".png";
+        imwrite(filename, gray_img);
 
         for (int i = 0; i < boardSize.height; i++)
             for (int j = 0; j < boardSize.width; j++)

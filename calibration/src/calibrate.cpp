@@ -232,7 +232,6 @@ int main(int argc, char** argv)
         t(2) = t_(2);
         cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
         cout<<"linear distance "<<(t - t_gt).norm()<<endl;
-        cout<<q.w()<<" "<<q.x()<<" "<<q.y()<<" "<<q.z()<<endl;
         cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
     }
 
@@ -256,7 +255,8 @@ int main(int argc, char** argv)
         world_pts.clear();
         int c = image_pts[0].x;
         int r = image_pts[0].y;
-        if (r >= image.size().height || c >= image.size().width)
+
+        if (r >= image.size().height || c >= image.size().width || r < 0 || c < 0)
             continue;
         
         Vec3b pixel = image.at<Vec3b>(r, c);
