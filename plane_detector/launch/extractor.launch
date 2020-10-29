@@ -3,8 +3,8 @@
 	<node pkg="unity_sw_mapping" type="unity_feature" name="unity_feature" output="screen"/>
 
 
-	<arg name="bag_name" default="14"/>
-	<node pkg="rosbag" type="play" name="rosbag" args="/home/sam/Desktop/lidar_camera/hkust2/$(arg bag_name).bag"/>
+	<arg name="bag_name" default="128"/>
+	<node pkg="rosbag" type="play" name="rosbag" args="/home/sam/lidar_camera/hkust3/$(arg bag_name).bag"/>
 
 
 	<node pkg="plane_detector" type="extract_plane" name="extract_plane" output="screen">

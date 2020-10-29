@@ -1,8 +1,8 @@
 <launch>
 
     <node pkg="plane_detector" type="detect_plane" name="detect_plane" output="screen">
-        <param name="board_num" type="int" value="0"/>
-        <param name="write_all" type="bool" value="false"/>
+        <param name="board_num" type="int" value="128"/>
+        <param name="write_all" type="bool" value="true"/>
         <param name="write_all_path" type="string" value="$(find plane_detector)/data/filter/init_l.json"/>
         <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/calib/"/>
         <param name="write_path" type="string" value="$(find plane_detector)/data/filter/"/>

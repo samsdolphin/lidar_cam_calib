@@ -96,8 +96,9 @@ int main(int argc, char** argv)
     if (write_all)
         file.open(write_all_path, std::ofstream::trunc);
 
-    for (size_t k = 0; k <= 22; k++)
+    for (int k = 100; k <= 128; k++)
     {
+        cout<<"processing "<<k<<endl;
         if (!write_all)
         {
             *pc_src = read_pointcloud(pointcloud_path + to_string(board_num) + ".json");
@@ -110,7 +111,6 @@ int main(int argc, char** argv)
             cv::FileStorage param_reader(boundary_param + to_string(k) + ".yaml", cv::FileStorage::READ);
             param_reader["boundary"] >> boundary;
         }
-        
         pc_rough->points.resize(1e8);
         size_t cnt = 0;
 
@@ -296,7 +296,6 @@ int main(int argc, char** argv)
         cout<<"distance "<<tmp<<endl;
         if (write_all)
             file << k << " " << svd_nor(0) << " " <<svd_nor(1) << " " << svd_nor(2) << " " << tmp << "\n";
-
         visualization_msgs::MarkerArray marker_array;
         visualization_msgs::Marker marker;
         marker.header.frame_id = "/camera_init";
@@ -336,7 +335,6 @@ int main(int argc, char** argv)
             write_pointcloud(pc_filt, write_path + to_string(board_num) + ".json");
         else
             write_pointcloud(pc_filt, write_path + to_string(k) + ".json");
-
         sensor_msgs::PointCloud2 laserCloudMsg;
         pcl::toROSMsg(*pc_src, laserCloudMsg);
         laserCloudMsg.header.stamp = ros::Time::now();

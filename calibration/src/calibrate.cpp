@@ -177,6 +177,7 @@ int main(int argc, char** argv)
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
     Vector3d t = p0_c - q * p0_l;
+    cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
     Vector3d t_gt(0.0175, 0.0548, 0);
     cout<<"linear distance "<<(t - t_gt).norm()<<endl;
