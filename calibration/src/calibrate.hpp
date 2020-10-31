@@ -14,6 +14,7 @@ public:
     ceres::Solver::Summary summary;
     ceres::ResidualBlockId block_id;
     std::vector<ceres::ResidualBlockId> residual_block_ids;
+    std::vector<ceres::ResidualBlockId> temp_residual_block_ids;
     double buffer[7];
 public:
     extrin_calib();

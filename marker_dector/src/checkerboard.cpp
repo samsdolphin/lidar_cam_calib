@@ -44,7 +44,7 @@ int main(int argc, char** argv)
         cout << "processing image " << k <<endl;
 		cv::Mat image = cv::imread(filename, cv::IMREAD_COLOR);
         cv::Mat gray_img;
-		cv::cvtColor(image, gray_img, CV_BGR2GRAY);
+		cv::cvtColor(image, gray_img, COLOR_BGR2GRAY);
         cv::Size boardSize(corner_width, corner_height);
 		vector<cv::Point3f> world_corners;
 		vector<cv::Point2f> img_corners, repro_corners;

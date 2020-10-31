@@ -177,10 +177,10 @@ int main(int argc, char** argv)
     Vector3d p0_l = n_l.transpose().inverse() * (d_l);
     Vector3d p0_c = n_c.transpose().inverse() * (d_c);
     Vector3d t = p0_c - q * p0_l;
-    cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
-    Vector3d t_gt(0.0175, 0.0548, 0);
+    Vector3d t_gt(0.0325, 0.0548, 0.0023);
     cout<<"linear distance "<<(t - t_gt).norm()<<endl;
+    cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
 
     cv::Vec3d rvec, tvec;
     cv::Mat R_mat = cv::Mat_<double>(3, 3);
@@ -193,6 +193,8 @@ int main(int argc, char** argv)
     for (int iter = 0; iter < 1; iter++)
     {
         extrin_calib calib;
+        Eigen::Map<Eigen::Quaterniond> q_ = Eigen::Map<Eigen::Quaterniond>(calib.buffer);
+        Eigen::Map<Eigen::Vector3d> t_ = Eigen::Map<Eigen::Vector3d>(calib.buffer + 4);
         calib.add_parameterblock();
         calib.init(q, t);
 
@@ -219,11 +221,16 @@ int main(int argc, char** argv)
             *pc_ = read_pointcloud(pointcloud_path + to_string(valid_n[i]) + ".json");
             calib.add_residualblock(pc_, center_cam[i], n_cam[i], q, t);
         }
-        ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
-        cout<<calib.summary.BriefReport()<<endl;
+        ceres::Problem::EvaluateOptions eval_options;
+        eval_options.residual_blocks = calib.residual_block_ids;
+        double total_cost = 0.0;
+        std::vector<double> residuals;
+        calib.problem.Evaluate(eval_options, &total_cost, &residuals, nullptr, nullptr);
+        double rej_val = compute_inlier(residuals, 0.99);
+        cout<<"rej_val "<<rej_val<<endl;
+        cout<<"size before "<<calib.residual_block_ids.size()<<endl;
 
-        Eigen::Map<Eigen::Quaterniond> q_ = Eigen::Map<Eigen::Quaterniond>(calib.buffer);
-        Eigen::Map<Eigen::Vector3d> t_ = Eigen::Map<Eigen::Vector3d>(calib.buffer + 4);
+        ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
         q.w() = q_.w();
         q.x() = q_.x();
         q.y() = q_.y();
@@ -234,6 +241,27 @@ int main(int argc, char** argv)
         cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
         cout<<"linear distance "<<(t - t_gt).norm()<<endl;
         cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
+        // for (size_t i = 0; i < residuals.size(); i++)
+        // {
+        //     if (residuals[i] < rej_val)
+        //         calib.temp_residual_block_ids.push_back(calib.residual_block_ids[i]);
+        //     else
+        //         calib.problem.RemoveResidualBlock(calib.residual_block_ids[i]);
+        // }
+        // calib.residual_block_ids = calib.temp_residual_block_ids;
+        // cout<<"size before "<<calib.residual_block_ids.size()<<endl;
+        // ceres::Solve(calib.options, &(calib.problem), &(calib.summary));
+        
+        // q.w() = q_.w();
+        // q.x() = q_.x();
+        // q.y() = q_.y();
+        // q.z() = q_.z();
+        // t(0) = t_(0);
+        // t(1) = t_(1);
+        // t(2) = t_(2);
+        // cout<<"angular distance "<<q_gt.angularDistance(q)<<endl;
+        // cout<<"linear distance "<<(t - t_gt).norm()<<endl;
+        // cout<<t(0)<<" "<<t(1)<<" "<<t(2)<<endl;
     }
 
     vector<cv::Point3f> world_pts;

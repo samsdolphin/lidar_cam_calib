@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="scene_num" default="7"/>
+    <arg name="scene_num" default="3"/>
     <node pkg="calibration" type="calibrate_extrinsic" name="calibrate_extrinsic" output="screen">
         <param name="camera_param" type="string" value="$(find marker_detector)/config/hkust3.yaml"/>
         <param name="image_path" type="string" value="$(find marker_detector)/fig/scene/$(arg scene_num).png"/>
