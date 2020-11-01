@@ -35,7 +35,7 @@ public:
 		int _flags, const string& _output_filename,
 		Pattern _pattern, double _aspectRatio,
 		bool _writeExtrinsics, bool _writePoints);
-					  
+
 	cv::Mat	camera_matrix;
 	cv::Mat dist_coeff;
 	cv::Size image_size;

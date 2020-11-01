@@ -1,0 +1,16 @@
+<launch>
+
+    <arg name="scene_num" default="3"/>
+    <node pkg="intrinsic_calib" type="calibrate_intrinsic" name="calibrate_intrinsic" output="screen">
+        <param name="square_size" type="double" value="0.08"/>
+        <param name="aspectRatio" type="double" value="1"/>
+        <param name="height" type="int" value="8"/>
+        <param name="width" type="int" value="12"/>
+        <param name="num_intrinsic" type="int" value=""/>
+        <param name="output_filename" type="string" value=""/>
+        <param name="dir" type="string" value=""/>
+        <param name="writeExtrinsics" type="bool" value="false"/>
+        <param name="writePoints" type="bool" value="false"/>
+    </node>
+
+</launch>
