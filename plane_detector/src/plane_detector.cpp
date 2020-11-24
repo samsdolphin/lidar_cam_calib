@@ -96,17 +96,19 @@ int main(int argc, char** argv)
     if (write_all)
         file.open(write_all_path, std::ofstream::trunc);
 
-    for (int k = 100; k <= 128; k++)
+    for (int k = 0; k <= 41; k++)
     {
-        cout<<"processing "<<k<<endl;
         if (!write_all)
         {
+            cout<<"processing "<<board_num<<endl;
             *pc_src = read_pointcloud(pointcloud_path + to_string(board_num) + ".json");
             cv::FileStorage param_reader(boundary_param + to_string(board_num) + ".yaml", cv::FileStorage::READ);
             param_reader["boundary"] >> boundary;
         }
         else
         {
+            cout<<endl;
+            cout<<"processing "<<k<<endl;
             *pc_src = read_pointcloud(pointcloud_path + to_string(k) + ".json");
             cv::FileStorage param_reader(boundary_param + to_string(k) + ".yaml", cv::FileStorage::READ);
             param_reader["boundary"] >> boundary;
@@ -182,7 +184,7 @@ int main(int argc, char** argv)
 
             visualization_msgs::MarkerArray marker_array;
             visualization_msgs::Marker marker;
-            marker.header.frame_id = "/camera_init";
+            marker.header.frame_id = "camera_init";
             marker.header.stamp = ros::Time();
             marker.ns = "my_namespace";
             marker.id = it;
@@ -298,7 +300,7 @@ int main(int argc, char** argv)
             file << k << " " << svd_nor(0) << " " <<svd_nor(1) << " " << svd_nor(2) << " " << tmp << "\n";
         visualization_msgs::MarkerArray marker_array;
         visualization_msgs::Marker marker;
-        marker.header.frame_id = "/camera_init";
+        marker.header.frame_id = "camera_init";
         marker.header.stamp = ros::Time();
         marker.ns = "my_namespace";
         marker.id = max_SVD_iteration;
@@ -338,22 +340,23 @@ int main(int argc, char** argv)
         sensor_msgs::PointCloud2 laserCloudMsg;
         pcl::toROSMsg(*pc_src, laserCloudMsg);
         laserCloudMsg.header.stamp = ros::Time::now();
-        laserCloudMsg.header.frame_id = "/camera_init";
+        laserCloudMsg.header.frame_id = "camera_init";
         pub_origin.publish(laserCloudMsg);
 
         pcl::toROSMsg(*pc_rough, laserCloudMsg);
         laserCloudMsg.header.stamp = ros::Time::now();
-        laserCloudMsg.header.frame_id = "/camera_init";
+        laserCloudMsg.header.frame_id = "camera_init";
         pub_rough.publish(laserCloudMsg);
 
         pcl::toROSMsg(*pc_filt, laserCloudMsg);
         laserCloudMsg.header.stamp = ros::Time::now();
-        laserCloudMsg.header.frame_id = "/camera_init";
+        laserCloudMsg.header.frame_id = "camera_init";
         pub_filt.publish(laserCloudMsg);
 
         if (!write_all)
             break;
     }
+
     if (write_all)
         file.close();
 

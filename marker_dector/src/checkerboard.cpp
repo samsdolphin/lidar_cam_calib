@@ -38,7 +38,7 @@ int main(int argc, char** argv)
     vector<int> valid_n;
     vector<double> dis;
 
-    for (int k = 100; k <= image_num; k++)
+    for (int k = 0; k <= image_num; k++)
     {
         string filename = image_path + to_string(k) + ".png";
         cout << "processing image " << k <<endl;

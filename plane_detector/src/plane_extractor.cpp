@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "plane_extractor");
     ros::NodeHandle nh("~");
-    ros::Subscriber sub_surf = nh.subscribe<sensor_msgs::PointCloud2>("/pc2_surfaceN", 10000, surf_callback);
+    ros::Subscriber sub_surf = nh.subscribe<sensor_msgs::PointCloud2>("/pc2_surfN", 10000, surf_callback);
 
     nh.getParam("data_write_path", data_path);
 
