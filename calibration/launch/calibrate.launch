@@ -1,22 +1,22 @@
 <launch>
 
-    <arg name="scene_num" default="8"/>
-    <node pkg="calibration" type="calibrate_extrinsic" name="calibrate_extrinsic" output="screen">
-        <param name="camera_param" type="string" value="$(find marker_detector)/config/large.yaml"/>
-        <param name="image_path" type="string" value="$(find marker_detector)/fig/scene/$(arg scene_num).png"/>
-        <param name="scene_pointcloud" type="string" value="$(find plane_detector)/data/scene/$(arg scene_num).json"/>
-        <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/filter/hkust4/"/>
-        <param name="normal_path" type="string" value="$(find marker_detector)/fig/normal.json"/>
-        <param name="init_camera_path" type="string" value="$(find marker_detector)/fig/init_c.json"/>
-        <param name="init_lidar_path" type="string" value="$(find plane_detector)/data/filter/init_l.json"/>
-        <param name="init_ln" type="int" value="20"/>
-        <param name="init_mn" type="int" value="7"/>
-        <param name="init_rn" type="int" value="6"/>
-    </node>
+  <arg name="scene_num" default="16"/>
+  <node pkg="calibration" type="calibrate_extrinsic" name="calibrate_extrinsic" output="screen">
+    <param name="camera_param" type="string" value="$(find marker_detector)/config/fr.yaml"/>
+    <param name="image_path" type="string" value="$(find marker_detector)/fig/scene/$(arg scene_num).png"/>
+    <param name="scene_pointcloud" type="string" value="$(find plane_detector)/data/scene/$(arg scene_num).pcd"/>
+    <param name="pointcloud_path" type="string" value="$(find plane_detector)/data/filter/huawei/"/>
+    <param name="normal_path" type="string" value="$(find marker_detector)/fig/normal.json"/>
+    <param name="init_camera_path" type="string" value="$(find marker_detector)/fig/init_c.json"/>
+    <param name="init_lidar_path" type="string" value="$(find plane_detector)/data/filter/init_l.json"/>
+    <param name="init_ln" type="int" value="1"/>
+    <param name="init_mn" type="int" value="0"/>
+    <param name="init_rn" type="int" value="2"/>
+  </node>
 
-    <arg name="rviz" default="true"/>
-    <group if="$(arg rviz)">
-        <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find calibration)/rviz/calib.rviz"/>
-    </group>
+  <arg name="rviz" default="true"/>
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find calibration)/rviz/calib.rviz"/>
+  </group>
 
 </launch>

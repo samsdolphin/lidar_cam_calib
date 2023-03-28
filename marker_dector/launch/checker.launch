@@ -1,12 +1,12 @@
 <launch>
-    <node pkg="marker_detector" name="checkerboard" type="checkerboard" output="screen">
-        <param name="camera_param_config" type="string" value="$(find marker_detector)/config/large.yaml"/>
-        <param name="image_path" type="string" value="$(find marker_detector)/fig/hkust4/"/>
-        <param name="normal_write_path" type="string" value="$(find marker_detector)/fig/init_c.json"/>
-        <param name="corner_height" type="int" value="8"/>
-        <param name="corner_width" type="int" value="12"/>
-        <param name="square_size" type="double" value="0.08"/>
-        <param name="image_num" type="int" value="41"/>
-        <param name="reproject_err" type="double" value="1"/>
-    </node>
+  <node pkg="marker_detector" name="checkerboard" type="checkerboard" output="screen">
+    <param name="camera_param_config" type="string" value="$(find marker_detector)/config/fr.yaml"/>
+    <param name="image_path" type="string" value="$(find marker_detector)/fig/huawei/"/>
+    <param name="normal_write_path" type="string" value="$(find marker_detector)/fig/init_c.json"/>
+    <param name="corner_height" type="int" value="6"/>
+    <param name="corner_width" type="int" value="8"/>
+    <param name="square_size" type="double" value="0.1"/>
+    <param name="image_num" type="int" value="2"/>
+    <param name="reproject_err" type="double" value="1"/>
+  </node>
 </launch>

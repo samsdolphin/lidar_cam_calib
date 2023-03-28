@@ -58,7 +58,7 @@ public:
 
 	void load_images(int _image_num, const string& path);
 	void calibrate();
-	void undistort(const string& path, const string& undistort_path);
+	void undistort(const string& path, const string& undistort_path, int _image_num);
 	
 	static double computeReprojectionErrors(
 		const vector<vector<Point3f>>& objectPoints,

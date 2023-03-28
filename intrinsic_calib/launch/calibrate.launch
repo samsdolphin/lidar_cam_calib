@@ -1,16 +1,16 @@
 <launch>
-
-    <arg name="scene_num" default="3"/>
-    <node pkg="intrinsic_calib" type="calibrate_intrinsic" name="calibrate_intrinsic" output="screen">
-        <param name="square_size" type="double" value="0.08"/>
-        <param name="aspectRatio" type="double" value="1"/>
-        <param name="height" type="int" value="8"/>
-        <param name="width" type="int" value="12"/>
-        <param name="num_intrinsic" type="int" value=""/>
-        <param name="output_filename" type="string" value=""/>
-        <param name="dir" type="string" value=""/>
-        <param name="writeExtrinsics" type="bool" value="false"/>
-        <param name="writePoints" type="bool" value="false"/>
-    </node>
-
+  <!-- <arg name="scene_num" default="30"/> -->
+  <node pkg="intrinsic_calib" type="calibrate_intrinsic" name="calibrate_intrinsic" output="screen">
+    <param name="square_size" type="double" value="0.1"/>
+    <param name="height" type="int" value="2048"/>
+    <param name="width" type="int" value="2448"/>
+    <param name="aspectRatio" type="double" value="1"/>
+    <param name="height" type="int" value="6"/>
+    <param name="width" type="int" value="8"/>
+    <param name="num_intrinsic" type="int" value="2000"/>
+    <param name="output_filename" type="string" value="$(find intrinsic_calib)/results/fr.yaml"/>
+    <param name="dir" type="string" value="/media/sam/CR7/huawei/fr/test/"/>
+    <param name="writeExtrinsics" type="bool" value="false"/>
+    <param name="writePoints" type="bool" value="false"/>
+  </node>
 </launch>

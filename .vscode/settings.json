@@ -1,0 +1,15 @@
+{
+  "files.associations": {
+    "*.tcc": "cpp",
+    "deque": "cpp",
+    "list": "cpp",
+    "string": "cpp",
+    "vector": "cpp",
+    "bitset": "cpp",
+    "string_view": "cpp",
+    "ratio": "cpp",
+    "iostream": "cpp",
+    "ostream": "cpp",
+    "iosfwd": "cpp"
+  }
+}
