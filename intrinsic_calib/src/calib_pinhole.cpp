@@ -6,7 +6,7 @@
 using namespace std;
 using namespace cv;
 
-string filepath = "/media/sam/data/IJRR/intrinsic/20220718/";
+string filepath = "/media/sam/data/IJRR/intrinsic/20230218/";
 
 double getDistance(Point2f point1, Point2f point2)
 {
@@ -36,7 +36,7 @@ int main()
 {
   ofstream fout(filepath + "caliberation_result.txt");
   double thr = 0.3; // 重投影误差threshold，超过这个值的图片不会被优化
-  Size board_size = Size(6, 4); // 棋盘格内角点数
+  Size board_size = Size(8, 6); // 棋盘格内角点数
 
   vector<Point2f> corners;
   vector<vector<Point2f>> corners_Seq, corners_Seq2;
@@ -68,7 +68,7 @@ int main()
     image_Seq.push_back(image);
   }
   
-  float square_size = 0.05; // 棋盘格方格边长
+  float square_size = 0.1; // 棋盘格方格边长
 	vector<vector<Point3f>> object_Points, object_Points2;
 
   vector<int> point_counts;                                                         
@@ -100,7 +100,9 @@ int main()
   flags |= cv::fisheye::CALIB_FIX_SKEW;
   cout<<"begin 1st calibration..."<<endl;
   calibrateCamera(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs,
-                  rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
+                  rotation_vectors, translation_vectors);
+  // calibrateCamera(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs,
+  //                 rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
   cout<<"1st calibration completed!"<<endl;
 
   double total_err = 0.0;
@@ -126,7 +128,7 @@ int main()
         tempPointSet2.push_back(object_Points[i][j]);
       }
     }
-    cout<<"seq "<<i<<" valid "<<corners2.size()<<endl;
+    // cout<<"seq "<<i<<" valid "<<corners2.size()<<endl;
     corners_Seq2.push_back(corners2);
     object_Points2.push_back(tempPointSet2);
     valid_cnt += tempImagePoint.size();
