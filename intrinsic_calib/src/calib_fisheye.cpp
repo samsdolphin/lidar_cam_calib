@@ -1,6 +1,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d.hpp>
 #include <fstream>
+#include <filesystem>
+
 using namespace std;
 using namespace cv;
 
@@ -12,10 +14,17 @@ double getDistance(Point2f point1, Point2f point2)
   return distance;
 }
 
+vector<string> read_filenames(string filepath)
+{
+  std::vector<std::string> result;
+  for(const auto& entry: std::filesystem::directory_iterator(filepath))
+    result.push_back(entry.path());
+  return result;
+}
+
 int main()
 {
   ofstream fout(filepath + "caliberation_result.txt");
-  int image_count = 2500; // 最多读到的图片编号
   double thr = 0.3; // 重投影误差threshold，超过这个值的图片不会被优化
   Size board_size = Size(8, 6); // 棋盘格内角点数
 
@@ -25,9 +34,11 @@ int main()
   int successImageNum = 0;
   
   for(int j = 1; j <= 3; j++)
-    for(int i = 0; i <= image_count; i++)
+  {
+    vector<string> img_names = read_filenames(filepath + "BR" + std::to_string(j) + "/");
+    for(int i = 0; i <= img_names.size(); i++)
     {
-      cv::Mat image = imread(filepath + "BR" + std::to_string(j) + "/" + to_string(i) + ".png");
+      cv::Mat image = imread(img_names[i]);
       if(image.empty())
         continue;
       
@@ -50,6 +61,7 @@ int main()
       cout<<"processed "<<j<<" img "<<i<<endl;
       image_Seq.push_back(image);
     }
+  }
 
   float square_size = 0.1015; // 棋盘格方格边长
 	vector<vector<Point3f>> object_Points, object_Points2;
@@ -122,37 +134,37 @@ int main()
   cout << intrinsic_matrix << endl;
   cout << distortion_coeffs << endl;
 
-  cout<<"begin 2nd calibration..."<<endl;
-  fisheye::calibrate(object_Points2, corners_Seq2, image_size, intrinsic_matrix, distortion_coeffs,
-                     rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
-  cout<<"2nd calibration completed!"<<endl;
+  // cout<<"begin 2nd calibration..."<<endl;
+  // fisheye::calibrate(object_Points2, corners_Seq2, image_size, intrinsic_matrix, distortion_coeffs,
+  //                    rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
+  // cout<<"2nd calibration completed!"<<endl;
 
-  valid_cnt = 0;
-  total_err = 0.0;
-  for(int i = 0; i < successImageNum; i++) 
-  {
-    vector<Point3f> tempPointSet = object_Points2[i]; // 3D点
-    fisheye::projectPoints(tempPointSet, image_points2, rotation_vectors[i], translation_vectors[i],
-                           intrinsic_matrix, distortion_coeffs);
-    vector<Point2f> tempImagePoint = corners_Seq2[i]; // 提取到的2D点
-    err = 0.0;
-    for(size_t j = 0; j < tempImagePoint.size(); j++)
-      err += getDistance(tempImagePoint[j], image_points2[j]);
-    total_err += err;
-    valid_cnt += tempImagePoint.size();
-    // cout<<"img "<<i<<" valid "<<tempImagePoint.size()<<endl;
-  }
-  cout<<"2nd total error "<<total_err/valid_cnt<<endl;
+  // valid_cnt = 0;
+  // total_err = 0.0;
+  // for(int i = 0; i < successImageNum; i++) 
+  // {
+  //   vector<Point3f> tempPointSet = object_Points2[i]; // 3D点
+  //   fisheye::projectPoints(tempPointSet, image_points2, rotation_vectors[i], translation_vectors[i],
+  //                          intrinsic_matrix, distortion_coeffs);
+  //   vector<Point2f> tempImagePoint = corners_Seq2[i]; // 提取到的2D点
+  //   err = 0.0;
+  //   for(size_t j = 0; j < tempImagePoint.size(); j++)
+  //     err += getDistance(tempImagePoint[j], image_points2[j]);
+  //   total_err += err;
+  //   valid_cnt += tempImagePoint.size();
+  //   // cout<<"img "<<i<<" valid "<<tempImagePoint.size()<<endl;
+  // }
+  // cout<<"2nd total error "<<total_err/valid_cnt<<endl;
 
-  fout << intrinsic_matrix << endl;
-  fout << distortion_coeffs << endl;
-  cout << intrinsic_matrix << endl;
-  cout << distortion_coeffs << endl;
+  // fout << intrinsic_matrix << endl;
+  // fout << distortion_coeffs << endl;
+  // cout << intrinsic_matrix << endl;
+  // cout << distortion_coeffs << endl;
 
-  Mat mapx = Mat(image_size, CV_32FC1);
-  Mat mapy = Mat(image_size, CV_32FC1);
-  Mat R = Mat::eye(3,3,CV_32F);
-  fisheye::initUndistortRectifyMap(intrinsic_matrix,distortion_coeffs,R,intrinsic_matrix,image_size,CV_32FC1,mapx,mapy);
+  // Mat mapx = Mat(image_size, CV_32FC1);
+  // Mat mapy = Mat(image_size, CV_32FC1);
+  // Mat R = Mat::eye(3,3,CV_32F);
+  // fisheye::initUndistortRectifyMap(intrinsic_matrix,distortion_coeffs,R,intrinsic_matrix,image_size,CV_32FC1,mapx,mapy);
   // Mat t = imread("/media/sam/CR7/huawei/centennial/3.png");
   // cv::remap(t,t,mapx, mapy, INTER_LINEAR);
   // string imageFileName;

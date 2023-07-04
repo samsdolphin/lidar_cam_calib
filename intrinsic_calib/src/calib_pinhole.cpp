@@ -6,7 +6,7 @@
 using namespace std;
 using namespace cv;
 
-string filepath = "/media/sam/data/IJRR/intrinsic/20230218/";
+string filepath = "/home/sam/Downloads/i7/";
 
 double getDistance(Point2f point1, Point2f point2)
 {
