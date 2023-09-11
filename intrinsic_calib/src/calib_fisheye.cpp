@@ -1,5 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/highgui/highgui_c.h>
 #include <fstream>
 #include <filesystem>
 
@@ -36,14 +37,14 @@ int main()
   for(int j = 1; j <= 3; j++)
   {
     vector<string> img_names = read_filenames(filepath + "BR" + std::to_string(j) + "/");
-    for(int i = 0; i <= img_names.size(); i++)
+    for(size_t i = 0; i <= img_names.size(); i++)
     {
       cv::Mat image = imread(img_names[i]);
       if(image.empty())
         continue;
       
       Mat imageGray;
-      cvtColor(image, imageGray , CV_RGB2GRAY);
+      cvtColor(image, imageGray , COLOR_BGR2GRAY);
       bool patternfound = findChessboardCorners(image, board_size, corners,
         CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
       if(!patternfound)

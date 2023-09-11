@@ -26,14 +26,8 @@ include_directories(
 
 catkin_package()
 
-add_executable(calibrate_intrinsic src/camera_calibration.cpp)
-target_link_libraries(calibrate_intrinsic ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${PCL_LIBRARIES})
-
 add_executable(calib_fisheye src/calib_fisheye.cpp)
 target_link_libraries(calib_fisheye ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(calib_pinhole src/calib_pinhole.cpp)
 target_link_libraries(calib_pinhole ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${PCL_LIBRARIES})
-
-add_executable(check_intrinsic src/check_intrinsic.cpp)
-target_link_libraries(check_intrinsic ${catkin_LIBRARIES} ${OpenCV_LIBS} ${CERES_LIBRARIES} ${PCL_LIBRARIES})

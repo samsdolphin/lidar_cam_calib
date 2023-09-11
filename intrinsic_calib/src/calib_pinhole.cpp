@@ -1,12 +1,13 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/calib3d.hpp>
+#include <opencv2/highgui/highgui_c.h>
 #include <fstream>
 #include <dirent.h>
 
 using namespace std;
 using namespace cv;
 
-string filepath = "/home/sam/Downloads/i7/";
+string filepath = "/home/sam/Desktop/lht/in/up/";
 
 double getDistance(Point2f point1, Point2f point2)
 {
@@ -36,7 +37,8 @@ int main()
 {
   ofstream fout(filepath + "caliberation_result.txt");
   double thr = 0.3; // 重投影误差threshold，超过这个值的图片不会被优化
-  Size board_size = Size(8, 6); // 棋盘格内角点数
+  // Size board_size = Size(6, 4); // 棋盘格内角点数
+  Size board_size = Size(11, 8); // 棋盘格内角点数
 
   vector<Point2f> corners;
   vector<vector<Point2f>> corners_Seq, corners_Seq2;
@@ -44,13 +46,13 @@ int main()
   int successImageNum = 0;
 
   vector<string> camera_files = readfile(filepath);
-  for(int i = 0; i < camera_files.size(); i++)
+  for(size_t i = 0; i < camera_files.size(); i++)
   {
     Mat image = imread(filepath + camera_files[i]);
     if(image.empty()) continue;
 
     Mat imageGray;
-    cvtColor(image, imageGray , CV_RGB2GRAY);
+    cvtColor(image, imageGray , COLOR_BGR2GRAY);
     bool patternfound = findChessboardCorners(image, board_size, corners,
       CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
     if(!patternfound)
@@ -68,7 +70,8 @@ int main()
     image_Seq.push_back(image);
   }
   
-  float square_size = 0.1; // 棋盘格方格边长
+  // float square_size = 0.05; // 棋盘格方格边长
+  float square_size = 0.045; // 棋盘格方格边长
 	vector<vector<Point3f>> object_Points, object_Points2;
 
   vector<int> point_counts;                                                         
@@ -100,9 +103,9 @@ int main()
   flags |= cv::fisheye::CALIB_FIX_SKEW;
   cout<<"begin 1st calibration..."<<endl;
   calibrateCamera(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs,
-                  rotation_vectors, translation_vectors);
+                  rotation_vectors, translation_vectors); // k1 k2 p1 p2 k3
   // calibrateCamera(object_Points, corners_Seq, image_size, intrinsic_matrix, distortion_coeffs,
-  //                 rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6));
+  //                 rotation_vectors, translation_vectors, flags, cv::TermCriteria(3, 20, 1e-6)); // k1 k2 0 0 k3
   cout<<"1st calibration completed!"<<endl;
 
   double total_err = 0.0;
